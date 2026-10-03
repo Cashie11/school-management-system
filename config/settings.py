@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
@@ -25,6 +26,54 @@ def env_list(name, default=""):
     return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
 
 
+def env_hosts(name, default=""):
+    """Parse a comma separated host list, tolerating full URLs.
+
+    Django requires bare host names: no scheme, port or path. Deployments often
+    paste the public URL instead, which fails every request with a confusing
+    ``DisallowedHost`` error, so normalise the value here.
+    """
+
+    hosts = []
+    for item in env_list(name, default):
+        value = item.strip()
+        if "//" in value:  # drop the scheme
+            value = value.split("//", 1)[1]
+        if "@" in value:  # drop any credentials
+            value = value.rsplit("@", 1)[1]
+        value = value.split("/", 1)[0]  # drop any path
+        if value.startswith("["):  # keep bracketed IPv6 intact
+            value = value.split("]", 1)[0] + "]"
+        else:
+            value = value.split(":", 1)[0]  # drop any port
+        value = value.strip().lower()
+        if value and value not in hosts:
+            hosts.append(value)
+    return hosts
+
+
+def env_origins(name, default=""):
+    """Parse CSRF trusted origins, normalising them to ``scheme://host[:port]``.
+
+    A scheme is added when it is missing, and any trailing slash or path is
+    removed, because Django rejects origins that are not exact.
+    """
+
+    origins = []
+    for item in env_list(name, default):
+        value = item.strip().rstrip("/")
+        if not value:
+            continue
+        if "//" not in value:
+            value = "https://" + value
+        parts = urlsplit(value)
+        if parts.scheme and parts.netloc:
+            origin = f"{parts.scheme}://{parts.netloc}"
+            if origin not in origins:
+                origins.append(origin)
+    return origins
+
+
 DEBUG = env_bool("DJANGO_DEBUG", False)
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "").strip()
@@ -36,7 +85,24 @@ if not SECRET_KEY:
             "DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is off."
         )
 
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = env_hosts("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+CSRF_TRUSTED_ORIGINS = env_origins("DJANGO_CSRF_TRUSTED_ORIGINS")
+
+# An origin trusted for CSRF is a host the site is served from, so keep the two
+# lists in step. Setting only DJANGO_CSRF_TRUSTED_ORIGINS to the full public URL
+# is a common deployment mistake; this makes it work regardless.
+for _origin in CSRF_TRUSTED_ORIGINS:
+    _host = urlsplit(_origin).hostname
+    if _host and ":" in _host:  # IPv6 hosts must stay bracketed for Django
+        _host = f"[{_host}]"
+    if _host and _host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_host)
+
+if not ALLOWED_HOSTS and not DEBUG:
+    raise ImproperlyConfigured(
+        "DJANGO_ALLOWED_HOSTS is empty. Set it to the domain the site is served "
+        "from, for example DJANGO_ALLOWED_HOSTS=school.example.com."
+    )
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -192,7 +258,6 @@ SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", False)
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "same-origin"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
 
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"

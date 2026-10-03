@@ -81,7 +81,10 @@ Worth knowing before a real deployment:
 
 - **`DJANGO_SECRET_KEY` is required** once `DJANGO_DEBUG` is off; the application refuses to
   start without it.
-- **`DJANGO_ALLOWED_HOSTS`** must list your domain.
+- **`DJANGO_ALLOWED_HOSTS`** must list your domain, as bare host names with no
+  scheme, port or path (`school.example.com`). A full URL is tolerated and
+  normalised, and a host added to `DJANGO_CSRF_TRUSTED_ORIGINS` is allowed
+  automatically, so the common `DisallowedHost` mistake cannot happen.
 - Set **`DJANGO_SECURE_SSL_REDIRECT=1`** and terminate TLS at your proxy once a certificate
   exists, and add the public origin to **`DJANGO_CSRF_TRUSTED_ORIGINS`**. gunicorn trusts
   `X-Forwarded-Proto` from `127.0.0.1`; widen `GUNICORN_FORWARDED_ALLOW_IPS` if your proxy
@@ -102,7 +105,7 @@ Worth knowing before a real deployment:
 | --- | --- |
 | `DJANGO_SECRET_KEY` | Signing key. Set a private value outside development. |
 | `DJANGO_DEBUG` | `1` enables debug mode. Defaults to off. |
-| `DJANGO_ALLOWED_HOSTS` | Comma separated host names. |
+| `DJANGO_ALLOWED_HOSTS` | Comma separated host names. Bare hosts; URLs are normalised. |
 | `DJANGO_USE_SQLITE` | `1` forces SQLite even when `POSTGRES_HOST` is set. |
 | `POSTGRES_DB` | Database name. |
 | `POSTGRES_USER` | Database user. |
@@ -111,7 +114,7 @@ Worth knowing before a real deployment:
 | `POSTGRES_PORT` | Database port. Defaults to `5432`. |
 | `POSTGRES_CONN_MAX_AGE` | Seconds to reuse a database connection. Defaults to `60`. |
 | `DJANGO_MEDIA_ROOT` | Where uploaded logos are stored. Defaults to `media/`. |
-| `DJANGO_CSRF_TRUSTED_ORIGINS` | Comma separated origins for CSRF over HTTPS. |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | Comma separated origins for CSRF over HTTPS. Their hosts are added to `DJANGO_ALLOWED_HOSTS`. |
 | `DJANGO_LOG_LEVEL` | Root log level. Defaults to `INFO`. |
 | `GUNICORN_WORKERS` / `GUNICORN_THREADS` | gunicorn process and thread counts. |
 | `CELERY_BROKER_URL` | Redis broker for background email. |
