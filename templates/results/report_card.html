@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Report card{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Report card</h1>
+        <p class="page-lead">{{ report.student.full_name }} - {% if report.school_class %}{{ report.school_class }}{% else %}No class{% endif %} - {{ report.term }}</p>
+    </div>
+    <div class="row">
+        <a class="btn btn-primary" href="{% url 'results:report_card_download' report.student.pk report.term.pk %}">Download PDF</a>
+        <form class="inline-form" method="post" action="{% url 'results:email_report' report.student.pk report.term.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-secondary" type="submit">Email results</button>
+        </form>
+        <a class="btn btn-secondary" href="{% url 'results:report_card_select' %}?term={{ report.term.pk }}">Back</a>
+    </div>
+</div>
+
+{% include "results/_tabs.html" %}
+
+<div class="stat-grid">
+    <div class="stat stat--accent">
+        <div class="stat-value">{% if report.overall is not None %}{{ report.overall }}%{% else %}-{% endif %}</div>
+        <div class="stat-label">Overall percentage</div>
+    </div>
+    <div class="stat">
+        <div class="stat-value">{{ report.grade.0|default:"-" }}</div>
+        <div class="stat-label">Grade{% if report.grade %} - {{ report.grade.1 }}{% endif %}</div>
+    </div>
+    <div class="stat">
+        <div class="stat-value">{{ report.total_obtained }} / {{ report.total_possible }}</div>
+        <div class="stat-label">Total score</div>
+    </div>
+    <div class="stat stat--dark">
+        <div class="stat-value">{% if position %}{{ position }} / {{ class_size }}{% else %}-{% endif %}</div>
+        <div class="stat-label">Position in class</div>
+    </div>
+</div>
+
+<section class="section">
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th class="numeric">Score</th>
+                    <th class="numeric">Out of</th>
+                    <th class="numeric">Percentage</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in report.subjects %}
+                    <tr>
+                        <td>{{ subject.subject }}</td>
+                        <td class="numeric">{{ subject.obtained }}</td>
+                        <td class="numeric">{{ subject.possible }}</td>
+                        <td class="numeric">{% if subject.percentage is not None %}{{ subject.percentage }}%{% else %}-{% endif %}</td>
+                        <td>{% if subject.grade %}<span class="badge badge--neutral">{{ subject.grade.0 }}</span>{% else %}-{% endif %}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="empty-state">No subjects are assigned to this class.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% if report.subjects %}
+<section class="section">
+    <h2 class="section-title">Assessment detail</h2>
+    <div class="grid-2">
+        {% for subject in report.subjects %}
+            <div class="card card--white">
+                <h3 class="card-title" style="font-size: 1rem;">{{ subject.subject }}</h3>
+                <dl class="detail-list">
+                    {% for entry in subject.scores %}
+                        <dt>{{ entry.assessment.name }}</dt>
+                        <dd>{% if entry.value is not None %}{{ entry.value }} / {{ entry.assessment.max_score }}{% else %}Not entered{% endif %}</dd>
+                    {% empty %}
+                        <dt>Assessments</dt>
+                        <dd>None</dd>
+                    {% endfor %}
+                </dl>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Announcements{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Announcements</h1>
+        <p class="page-lead">
+            {% if user.is_parent_student %}
+                Notices for your family and your classes.
+            {% else %}
+                Notices shown to staff, families and classes.
+            {% endif %}
+        </p>
+    </div>
+    {% if can_create %}
+        <a class="btn btn-primary" href="{% url 'announcements:create' %}"><i class="bi bi-megaphone"></i> New announcement</a>
+    {% endif %}
+</div>
+
+{% include "announcements/_list.html" with show_actions=can_create %}
+{% endblock %}

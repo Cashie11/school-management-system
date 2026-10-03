@@ -1,0 +1,17 @@
+{% if page.has_other_pages %}
+    <nav class="pagination">
+        {% if page.has_previous %}
+            <a class="btn btn-secondary btn-sm" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key|urlencode }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ page.previous_page_number }}">Previous</a>
+        {% else %}
+            <span class="btn btn-secondary btn-sm is-disabled">Previous</span>
+        {% endif %}
+
+        <span class="muted text-sm">Page {{ page.number }} of {{ page.paginator.num_pages }} - {{ page.paginator.count }} record{{ page.paginator.count|pluralize }}</span>
+
+        {% if page.has_next %}
+            <a class="btn btn-secondary btn-sm" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key|urlencode }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ page.next_page_number }}">Next</a>
+        {% else %}
+            <span class="btn btn-secondary btn-sm is-disabled">Next</span>
+        {% endif %}
+    </nav>
+{% endif %}

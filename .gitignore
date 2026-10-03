@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.py[cod]
+*.sqlite3
+.venv/
+venv/
+.ruff_cache/
+.pytest_cache/
+staticfiles/
+
+# Keep the media directory itself, ignore its contents.
+media/*
+!media/.gitkeep

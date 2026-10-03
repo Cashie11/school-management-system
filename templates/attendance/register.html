@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Daily register{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Daily register</h1>
+        <p class="page-lead">Mark attendance for a class, or for every class, on a given date.</p>
+    </div>
+</div>
+
+{% include "attendance/_tabs.html" %}
+
+<form class="filter-bar" method="get">
+    <div class="form-field">
+        <label for="school_class">Class</label>
+        <select id="school_class" name="school_class">
+            <option value="all" {% if all_mode %}selected{% endif %}>All classes</option>
+            {% for school_class in classes %}
+                <option value="{{ school_class.pk }}" {% if not all_mode and selected_class and selected_class.pk == school_class.pk %}selected{% endif %}>{{ school_class }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-field">
+        <label for="term">Term</label>
+        <select id="term" name="term">
+            {% for term in terms %}
+                <option value="{{ term.pk }}" {% if selected_term and selected_term.pk == term.pk %}selected{% endif %}>{{ term }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-field">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" value="{{ date|date:'Y-m-d' }}">
+    </div>
+    <button class="btn btn-secondary" type="submit"><i class="bi bi-search"></i> Load</button>
+</form>
+
+{% if not selected_term %}
+    <div class="card"><p class="muted">No academic term available. Add a term under Academics first.</p></div>
+{% elif not all_mode and not classes %}
+    <div class="card"><p class="muted">No classes available. Add a class under Academics first.</p></div>
+{% elif not rows %}
+    <div class="card">
+        <p class="muted">
+            {% if all_mode %}
+                No students are enrolled in any class for {{ selected_term }}.
+            {% else %}
+                No students are enrolled in {{ selected_class }} for {{ selected_term }}.
+            {% endif %}
+            Enroll students below or under Students.
+        </p>
+    </div>
+{% else %}
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="save">
+        <input type="hidden" name="school_class" value="{% if all_mode %}all{% else %}{{ selected_class.pk }}{% endif %}">
+        <input type="hidden" name="term" value="{{ selected_term.pk }}">
+        <input type="hidden" name="date" value="{{ date|date:'Y-m-d' }}">
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Class</th>
+                        <th>Status</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>{{ row.student.full_name }}</td>
+                            <td class="muted">{{ row.school_class }}</td>
+                            <td>
+                                <select name="status_{{ row.student.pk }}">
+                                    {% for value, label in statuses %}
+                                        <option value="{{ value }}" {% if value == row.status %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="note_{{ row.student.pk }}" value="{{ row.note }}" maxlength="200" placeholder="Optional">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Save attendance</button>
+            <span class="muted text-sm">{{ rows|length }} student{{ rows|length|pluralize }} on {{ date|date:"j M Y" }}</span>
+        </div>
+    </form>
+{% endif %}
+
+{% if other_classes %}
+    <section class="section">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">Enrolled in other classes this term</h2>
+                <p class="card-subtitle">These students are enrolled for {{ selected_term }} but not in {{ selected_class }}. Choose "All classes" above to mark everyone at once.</p>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr><th>Student</th><th>Class</th></tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in other_classes %}
+                        <tr>
+                            <td>{{ enrollment.student.full_name }}</td>
+                            <td class="muted">{{ enrollment.school_class }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endif %}
+
+{% if unlisted and not all_mode and selected_class and selected_term %}
+    <section class="section">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">Not enrolled for {{ selected_term }}</h2>
+                <p class="card-subtitle">These active students are not enrolled in any class for {{ selected_term }}. Enroll them in {{ selected_class }} to add them to the register.</p>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Admission number</th>
+                        <th class="numeric">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in unlisted %}
+                        <tr>
+                            <td>{{ student.full_name }}</td>
+                            <td class="muted">{{ student.admission_number }}</td>
+                            <td>
+                                <div class="table-actions">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="enroll">
+                                        <input type="hidden" name="student" value="{{ student.pk }}">
+                                        <input type="hidden" name="school_class" value="{{ selected_class.pk }}">
+                                        <input type="hidden" name="term" value="{{ selected_term.pk }}">
+                                        <input type="hidden" name="date" value="{{ date|date:'Y-m-d' }}">
+                                        <button class="btn btn-secondary btn-sm" type="submit"><i class="bi bi-person-plus"></i> Enroll in {{ selected_class }}</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endif %}
+{% endblock %}

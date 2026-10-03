@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}{{ assessment.name }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">{{ assessment.name }}</h1>
+        <p class="page-lead">{{ assessment.class_subject }} - {{ assessment.term }} - total {{ assessment.max_score }} points</p>
+    </div>
+    <div class="row">
+        {% if not locked %}<a class="btn btn-primary" href="{% url 'results:question_create' assessment.pk %}">Add question</a>{% endif %}
+        <a class="btn btn-secondary" href="{% url 'results:submission_list' assessment.pk %}">Submissions</a>
+    </div>
+</div>
+
+{% include "results/_tabs.html" %}
+
+{% if not assessment.is_online %}
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">Online questions are off</h2>
+                <p class="card-subtitle">This assessment is set to "Teacher enters marks", so there are no questions. Switch it to "Students answer online" to add objective and theory questions.</p>
+            </div>
+            <a class="btn btn-primary" href="{% url 'results:assessment_edit' assessment.pk %}">Change mode</a>
+        </div>
+    </div>
+{% else %}
+    <div class="card card--white" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">{% if assessment.is_published %}Published{% else %}Draft{% endif %}</h2>
+                <p class="card-subtitle">
+                    {% if assessment.available_from %}Opens {{ assessment.available_from|date:"j M Y H:i" }}{% else %}No opening time set{% endif %}
+                    {% if assessment.available_until %} - closes {{ assessment.available_until|date:"j M Y H:i" }}{% endif %}
+                    {% if assessment.duration_minutes %} - {{ assessment.duration_minutes }} minute limit{% endif %}
+                </p>
+            </div>
+            <form method="post" action="{% url 'results:assessment_publish' assessment.pk %}">
+                {% csrf_token %}
+                <button class="btn {% if assessment.is_published %}btn-secondary{% else %}btn-primary{% endif %}" type="submit">
+                    {% if assessment.is_published %}Unpublish{% else %}Publish{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% if locked %}
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <p class="muted">Students have already started this assessment, so the questions are locked. Reset their attempts under <strong>Submissions</strong> if you need to change them.</p>
+        </div>
+    {% endif %}
+
+    <section class="section">
+        <div class="card-header">
+            <h2 class="card-title">Objective section</h2>
+            {% if not locked %}<a class="btn btn-secondary btn-sm" href="{% url 'results:question_create' assessment.pk %}">Add objective question</a>{% endif %}
+        </div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="numeric">#</th>
+                        <th>Question</th>
+                        <th class="numeric">Points</th>
+                        <th>Answer options</th>
+                        <th class="numeric">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question in objective %}
+                        <tr>
+                            <td class="numeric">{{ question.order }}</td>
+                            <td>{{ question.text }}</td>
+                            <td class="numeric">{{ question.points }}</td>
+                            <td>
+                                {% for choice in question.choices.all %}
+                                    <span class="badge {% if choice.is_correct %}badge--active{% else %}badge--neutral{% endif %}">{{ choice.text }}</span>
+                                {% empty %}
+                                    <span class="muted">No options yet</span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    {% if not locked %}
+                                        <a class="btn btn-secondary btn-sm" href="{% url 'results:choice_create' question.pk %}">Add option</a>
+                                        <a class="btn btn-secondary btn-sm" href="{% url 'results:question_edit' question.pk %}">Edit</a>
+                                        <a class="btn btn-ghost btn-sm" href="{% url 'results:question_delete' question.pk %}">Delete</a>
+                                    {% else %}
+                                        <span class="muted text-sm">Locked</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="empty-state">No objective questions yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="card-header">
+            <h2 class="card-title">Theory section</h2>
+            <span class="muted text-sm">Theory answers are marked by the teacher.</span>
+        </div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="numeric">#</th>
+                        <th>Question</th>
+                        <th class="numeric">Points</th>
+                        <th class="numeric">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question in theory %}
+                        <tr>
+                            <td class="numeric">{{ question.order }}</td>
+                            <td>{{ question.text }}</td>
+                            <td class="numeric">{{ question.points }}</td>
+                            <td>
+                                <div class="table-actions">
+                                    {% if not locked %}
+                                        <a class="btn btn-secondary btn-sm" href="{% url 'results:question_edit' question.pk %}">Edit</a>
+                                        <a class="btn btn-ghost btn-sm" href="{% url 'results:question_delete' question.pk %}">Delete</a>
+                                    {% else %}
+                                        <span class="muted text-sm">Locked</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="empty-state">No theory questions yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endif %}
+{% endblock %}

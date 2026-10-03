@@ -1,0 +1,17 @@
+{% extends "notifications/_email_base.html" %}
+
+{% block content %}
+    <h1 style="margin:0 0 12px;font-size:22px;">Enrollment confirmed</h1>
+    <p style="margin:0 0 12px;">{{ student.full_name }} has been enrolled at {{ school.name }}.</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px 0;font-size:15px;">
+        <tr>
+            <td style="padding:4px 16px 4px 0;color:#8a8f98;">Class</td>
+            <td style="padding:4px 0;font-weight:bold;">{{ enrollment.school_class }}</td>
+        </tr>
+        <tr>
+            <td style="padding:4px 16px 4px 0;color:#8a8f98;">Term</td>
+            <td style="padding:4px 0;font-weight:bold;">{{ enrollment.term }}</td>
+        </tr>
+    </table>
+    <p style="margin:0;color:#8a8f98;font-size:13px;">Sign in to the portal to follow results and attendance.</p>
+{% endblock %}

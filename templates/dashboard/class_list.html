@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}My classes{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">My classes</h1>
+        <p class="page-lead">Every class available to you, with its subjects and students.</p>
+    </div>
+</div>
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Class</th>
+                <th class="numeric">Level</th>
+                <th>Subjects</th>
+                <th class="numeric">Students</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr>
+                    <td>{{ row.school_class }}</td>
+                    <td class="numeric">{{ row.school_class.level }}</td>
+                    <td>
+                        {% for class_subject in row.subjects %}
+                            <span class="badge badge--neutral">{{ class_subject.subject }}</span>
+                        {% empty %}
+                            <span class="muted">No subjects</span>
+                        {% endfor %}
+                    </td>
+                    <td class="numeric">{{ row.student_count }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="btn btn-secondary btn-sm" href="{% url 'dashboard:class_detail' row.school_class.pk %}">Open</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="empty-state">No classes are available to you yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Classes{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Classes</h1>
+        <p class="page-lead">A class is a group of students for a level, for example Grade 7.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'academics:class_create' %}"><i class="bi bi-plus-lg"></i> Add class</a>
+</div>
+
+{% include "academics/_tabs.html" %}
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th class="numeric">Level</th>
+                <th class="numeric">Subjects</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for school_class in classes %}
+                <tr>
+                    <td>{{ school_class.name }}</td>
+                    <td class="numeric">{{ school_class.level }}</td>
+                    <td class="numeric">{{ school_class.subject_count }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="btn btn-secondary btn-sm" href="{% url 'academics:class_edit' school_class.pk %}">Edit</a>
+                            <a class="btn btn-ghost btn-sm" href="{% url 'academics:class_delete' school_class.pk %}">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-state">No classes yet.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

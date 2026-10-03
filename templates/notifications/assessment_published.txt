@@ -1,0 +1,10 @@
+New assessment: {{ assessment.name }}
+
+An assessment has been set for {{ student.full_name }} at {{ school.name }}.
+
+Subject: {{ assessment.class_subject.subject }}
+Term: {{ assessment.term }}
+{% if assessment.available_until %}Closes: {{ assessment.available_until|date:"j M Y H:i" }}
+{% endif %}{% if assessment.duration_minutes %}Time limit: {{ assessment.duration_minutes }} minutes
+{% endif %}
+Sign in to the portal to open and submit it.

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}School profile{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">School profile</h1>
+        <p class="page-lead">The name and logo shown across the application.</p>
+    </div>
+</div>
+
+<div class="card card--white" style="max-width: 46rem;">
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {% include "partials/_form_errors.html" %}
+
+        <div class="form-grid">
+            <div class="form-field {% if form.name.errors %}has-error{% endif %}">
+                <label for="{{ form.name.id_for_label }}">School name</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+            <div class="form-field {% if form.email.errors %}has-error{% endif %}">
+                <label for="{{ form.email.id_for_label }}">Contact email</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 1.5rem; gap: 1.25rem;">
+            {% if school.logo %}
+                <img class="brand-logo" style="width: 4rem; height: 4rem;" src="{{ school.logo.url }}" alt="{{ school.name }}">
+            {% endif %}
+            <div class="form-field {% if form.logo.errors %}has-error{% endif %}" style="flex: 1;">
+                <label for="{{ form.logo.id_for_label }}">School logo</label>
+                {{ form.logo }}
+                <p class="help-text">
+                    PNG, JPEG or WEBP. A square image works best. At least 64 x 64 pixels,
+                    2 MB or smaller. SVG files are not accepted.
+                </p>
+                {{ form.logo.errors }}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Save</button>
+            <a class="btn btn-secondary" href="{{ cancel_url }}">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

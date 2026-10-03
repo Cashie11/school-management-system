@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{ subject }}</title>
+</head>
+<body style="margin:0;padding:0;background:#ecebe8;font-family:Arial,Helvetica,sans-serif;color:#29303d;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ecebe8;padding:24px 12px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#ffffff;border-radius:16px;">
+                    <tr>
+                        <td style="background:#2c2c2c;color:#ffffff;padding:20px 28px;font-size:18px;font-weight:bold;border-radius:16px 16px 0 0;">
+                            {{ school.name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:28px;font-size:15px;line-height:1.55;">
+                            {% block content %}{% endblock %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background:#2c2c2c;color:#ffffff;padding:16px 28px;font-size:12px;border-radius:0 0 16px 16px;">
+                            Sent by {{ school.name }} using School Management.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

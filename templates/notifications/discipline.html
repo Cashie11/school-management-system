@@ -1,0 +1,32 @@
+{% extends "notifications/_email_base.html" %}
+
+{% block content %}
+    <h1 style="margin:0 0 12px;font-size:22px;">{{ record.get_kind_display }} notice</h1>
+    <p style="margin:0 0 12px;">This notice concerns {{ student.full_name }} ({{ student.admission_number }}) at {{ school.name }}.</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px 0;font-size:15px;">
+        <tr>
+            <td style="padding:4px 16px 4px 0;color:#8a8f98;">Sanction</td>
+            <td style="padding:4px 0;font-weight:bold;">{{ record.get_kind_display }}</td>
+        </tr>
+        {% if record.start_date %}
+            <tr>
+                <td style="padding:4px 16px 4px 0;color:#8a8f98;">From</td>
+                <td style="padding:4px 0;font-weight:bold;">{{ record.start_date|date:"j M Y" }}</td>
+            </tr>
+        {% endif %}
+        {% if record.end_date %}
+            <tr>
+                <td style="padding:4px 16px 4px 0;color:#8a8f98;">Until</td>
+                <td style="padding:4px 0;font-weight:bold;">{{ record.end_date|date:"j M Y" }}</td>
+            </tr>
+        {% elif record.is_permanent %}
+            <tr>
+                <td style="padding:4px 16px 4px 0;color:#8a8f98;">Duration</td>
+                <td style="padding:4px 0;font-weight:bold;">Permanent</td>
+            </tr>
+        {% endif %}
+    </table>
+    <p style="margin:0 0 6px;color:#8a8f98;">Reason</p>
+    <p style="margin:0 0 12px;">{{ record.reason|linebreaksbr }}</p>
+    <p style="margin:0;color:#8a8f98;font-size:13px;">Contact the school office if you have questions about this notice.</p>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Parents and Students{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Parents and Students</h1>
+        <p class="page-lead">Parent accounts, each linked to the students it may view.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'accounts:parent_create' %}"><i class="bi bi-person-plus"></i> Add parent account</a>
+</div>
+
+{% include "accounts/_tabs.html" %}
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Linked students</th>
+                <th>Status</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for parent in parents %}
+                <tr>
+                    <td>{{ parent.get_full_name|default:"-" }}</td>
+                    <td class="muted">{{ parent.email }}</td>
+                    <td>
+                        {% for link in parent.linked_students %}
+                            <span class="badge badge--neutral">{{ link.student.full_name }}{% if link.is_primary %} - Primary{% endif %}</span>
+                        {% empty %}
+                            <span class="muted">Not linked</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if parent.is_active %}
+                            <span class="badge badge--active">Active</span>
+                        {% else %}
+                            <span class="badge badge--expulsion">Suspended</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <form class="inline-form" method="post" action="{% url 'accounts:user_toggle_active' parent.pk %}">
+                                {% csrf_token %}
+                                {% if parent.is_active %}
+                                    <button class="btn btn-secondary btn-sm" type="submit"><i class="bi bi-pause-circle"></i> Suspend</button>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm" type="submit"><i class="bi bi-play-circle"></i> Reactivate</button>
+                                {% endif %}
+                            </form>
+                            <a class="btn btn-ghost btn-sm" href="{% url 'accounts:user_delete' parent.pk %}"><i class="bi bi-trash"></i> Remove</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="empty-state"><i class="bi bi-inbox"></i>No parent accounts yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include "partials/_pagination.html" with page=parents %}
+{% endblock %}

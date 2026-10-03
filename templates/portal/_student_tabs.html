@@ -1,0 +1,5 @@
+<nav class="tabs">
+    <a class="nav-link {% if active == 'exams' %}active{% endif %}" href="{% url 'portal:student_exams' student.pk %}"><i class="bi bi-clipboard2-check"></i> Assessments</a>
+    <a class="nav-link {% if active == 'results' %}active{% endif %}" href="{% url 'portal:student_results' student.pk %}"><i class="bi bi-graph-up"></i> Results</a>
+    <a class="nav-link {% if active == 'attendance' %}active{% endif %}" href="{% url 'portal:student_attendance' student.pk %}"><i class="bi bi-calendar2-check"></i> Attendance</a>
+</nav>

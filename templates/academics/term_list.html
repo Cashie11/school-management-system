@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Terms{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Academic terms</h1>
+        <p class="page-lead">Terms group enrollment, attendance and assessments.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'academics:term_create' %}"><i class="bi bi-plus-lg"></i> Add term</a>
+</div>
+
+{% include "academics/_tabs.html" %}
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Current</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for term in terms %}
+                <tr>
+                    <td>{{ term.name }}</td>
+                    <td class="muted">{{ term.start_date|date:"j M Y" }}</td>
+                    <td class="muted">{{ term.end_date|date:"j M Y" }}</td>
+                    <td>
+                        {% if term.is_current %}
+                            <span class="badge badge--active">Current</span>
+                        {% else %}
+                            <span class="badge badge--neutral">No</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="btn btn-secondary btn-sm" href="{% url 'academics:term_edit' term.pk %}">Edit</a>
+                            <a class="btn btn-ghost btn-sm" href="{% url 'academics:term_delete' term.pk %}">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">No terms yet. Add the first term to begin.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

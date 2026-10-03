@@ -1,0 +1,8 @@
+Enrollment confirmed
+
+{{ student.full_name }} has been enrolled at {{ school.name }}.
+
+Class: {{ enrollment.school_class }}
+Term: {{ enrollment.term }}
+
+Sign in to the portal to follow results and attendance.

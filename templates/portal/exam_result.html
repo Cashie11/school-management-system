@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Result{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">{{ assessment.name }}</h1>
+        <p class="page-lead">{{ student.full_name }} - {{ assessment.class_subject.subject }} - {{ assessment.term }}</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url 'portal:student_exams' student.pk %}">Back</a>
+</div>
+
+{% if submission.status == "submitted" %}
+    <div class="card"><p class="muted">Submitted. Theory answers are waiting to be marked by the teacher.</p></div>
+{% endif %}
+
+<div class="stat-grid">
+    <div class="stat stat--accent">
+        <div class="stat-value">{% if submission.status == "marked" %}{{ submission.total_score }}{% else %}-{% endif %}</div>
+        <div class="stat-label">Total score (out of {{ assessment.max_score }})</div>
+    </div>
+    <div class="stat">
+        <div class="stat-value">{{ submission.objective_score|default:"-" }}</div>
+        <div class="stat-label">Objective</div>
+    </div>
+    <div class="stat">
+        <div class="stat-value">{{ submission.theory_score|default:"-" }}</div>
+        <div class="stat-label">Theory</div>
+    </div>
+    <div class="stat stat--dark">
+        <div class="stat-value">{{ submission.get_status_display }}</div>
+        <div class="stat-label">Status</div>
+    </div>
+</div>
+{% endblock %}

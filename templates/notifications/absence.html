@@ -1,0 +1,11 @@
+{% extends "notifications/_email_base.html" %}
+
+{% block content %}
+    <h1 style="margin:0 0 12px;font-size:22px;">Absence recorded</h1>
+    <p style="margin:0 0 12px;">{{ student.full_name }} was marked <strong>{{ record.get_status_display|lower }}</strong> on {{ record.date|date:"j M Y" }}.</p>
+    {% if record.note %}
+        <p style="margin:0 0 6px;color:#8a8f98;">Note from the school</p>
+        <p style="margin:0 0 12px;">{{ record.note }}</p>
+    {% endif %}
+    <p style="margin:0;color:#8a8f98;font-size:13px;">Contact the school office if this is not correct.</p>
+{% endblock %}

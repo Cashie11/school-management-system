@@ -1,0 +1,13 @@
+{{ record.get_kind_display }} notice
+
+This notice concerns {{ student.full_name }} ({{ student.admission_number }}) at {{ school.name }}.
+
+Sanction: {{ record.get_kind_display }}
+{% if record.start_date %}From: {{ record.start_date|date:"j M Y" }}
+{% endif %}{% if record.end_date %}Until: {{ record.end_date|date:"j M Y" }}
+{% elif record.is_permanent %}Duration: Permanent
+{% endif %}
+Reason:
+{{ record.reason }}
+
+Contact the school office if you have questions about this notice.

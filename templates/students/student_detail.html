@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}{{ student.full_name }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">{{ student.full_name }}</h1>
+        <p class="page-lead">Admission number {{ student.admission_number }}</p>
+    </div>
+    {% if user.is_school_admin or user.is_super_admin %}
+        <div class="row">
+            <a class="btn btn-secondary" href="{% url 'students:student_edit' student.pk %}">Edit</a>
+            <a class="btn btn-ghost" href="{% url 'students:student_delete' student.pk %}">Delete</a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="grid-2">
+    <section class="card card--white">
+        <h2 class="card-title">Profile</h2>
+        <dl class="detail-list">
+            <dt>Date of birth</dt>
+            <dd>{{ student.date_of_birth|date:"j M Y"|default:"-" }}</dd>
+            <dt>Gender</dt>
+            <dd>{{ student.get_gender_display|default:"-" }}</dd>
+            <dt>Status</dt>
+            <dd>{% if student.is_active %}Active{% else %}Inactive{% endif %}</dd>
+        </dl>
+    </section>
+
+    <section class="card card--white">
+        <div class="card-header">
+            <h2 class="card-title">Current enrollment</h2>
+            {% if user.is_school_admin or user.is_super_admin %}
+                <a class="btn btn-secondary btn-sm" href="{% url 'students:enrollment_create' %}?student={{ student.pk }}">Enroll</a>
+            {% endif %}
+        </div>
+        {% with enrollment=enrollments.first %}
+            {% if enrollment %}
+                <dl class="detail-list">
+                    <dt>Class</dt>
+                    <dd>{{ enrollment.school_class }}</dd>
+                    <dt>Term</dt>
+                    <dd>{{ enrollment.term }}</dd>
+                </dl>
+            {% else %}
+                <p class="muted text-sm">This student is not enrolled in a class yet.</p>
+            {% endif %}
+        {% endwith %}
+    </section>
+
+    <section class="card card--white">
+        <h2 class="card-title">Attendance</h2>
+        <dl class="detail-list">
+            <dt>Present</dt>
+            <dd>{{ attendance_summary.present|default:"0" }}</dd>
+            <dt>Absent</dt>
+            <dd>{{ attendance_summary.absent|default:"0" }}</dd>
+            <dt>Late</dt>
+            <dd>{{ attendance_summary.late|default:"0" }}</dd>
+            <dt>Excused</dt>
+            <dd>{{ attendance_summary.excused|default:"0" }}</dd>
+        </dl>
+    </section>
+</div>
+
+<section class="section">
+    <div class="card-header">
+        <h2 class="card-title">Enrollment history</h2>
+        {% if user.is_school_admin or user.is_super_admin %}
+            <a class="btn btn-secondary btn-sm" href="{% url 'students:enrollment_create' %}?student={{ student.pk }}">Enroll student</a>
+        {% endif %}
+    </div>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>Class</th>
+                    {% if user.is_school_admin or user.is_super_admin %}<th class="numeric">Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for enrollment in enrollments %}
+                    <tr>
+                        <td>{{ enrollment.term }}</td>
+                        <td>{{ enrollment.school_class }}</td>
+                        {% if user.is_school_admin or user.is_super_admin %}
+                            <td>
+                                <div class="table-actions">
+                                    <a class="btn btn-ghost btn-sm" href="{% url 'students:enrollment_delete' enrollment.pk %}">Remove</a>
+                                </div>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3" class="empty-state">No enrollment history.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <div class="card-header">
+        <h2 class="card-title">Guardians</h2>
+        {% if user.is_school_admin or user.is_super_admin %}
+            <a class="btn btn-secondary btn-sm" href="{% url 'students:guardian_create' %}?student={{ student.pk }}">Link guardian</a>
+        {% endif %}
+    </div>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Relationship</th>
+                    <th>Primary</th>
+                    {% if user.is_school_admin or user.is_super_admin %}<th class="numeric">Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for guardian in guardians %}
+                    <tr>
+                        <td>{{ guardian.user.get_full_name|default:guardian.user.email }}</td>
+                        <td class="muted">{{ guardian.relationship|default:"-" }}</td>
+                        <td>{% if guardian.is_primary %}<span class="badge badge--active">Primary</span>{% else %}<span class="badge badge--neutral">No</span>{% endif %}</td>
+                        {% if user.is_school_admin or user.is_super_admin %}
+                            <td>
+                                <div class="table-actions">
+                                    <a class="btn btn-ghost btn-sm" href="{% url 'students:guardian_delete' guardian.pk %}">Unlink</a>
+                                </div>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="empty-state">No guardians linked.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <div class="card-header">
+        <h2 class="card-title">Discipline</h2>
+        {% if user.is_school_admin or user.is_super_admin %}
+            <a class="btn btn-secondary btn-sm" href="{% url 'students:discipline_create' %}?student={{ student.pk }}">Record sanction</a>
+        {% endif %}
+    </div>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sanction</th>
+                    <th>From</th>
+                    <th>Until</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in discipline_records %}
+                    <tr>
+                        <td><span class="badge badge--{{ record.kind }}">{{ record.get_kind_display }}</span></td>
+                        <td class="muted">{{ record.start_date|date:"j M Y"|default:"-" }}</td>
+                        <td class="muted">
+                            {% if record.end_date %}{{ record.end_date|date:"j M Y" }}{% elif record.is_permanent %}Permanent{% else %}-{% endif %}
+                        </td>
+                        <td class="muted">{{ record.reason }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="empty-state">No sanctions recorded.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <div class="card-header">
+        <h2 class="card-title"><i class="bi bi-envelope-paper"></i> Notifications sent</h2>
+        {% if user.is_school_admin or user.is_super_admin %}
+            {% if emails %}
+                <a class="btn btn-ghost btn-sm" href="{% url 'notifications:clear_student_emails' student.pk %}"><i class="bi bi-eraser"></i> Clear all</a>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sent</th>
+                    <th>Type</th>
+                    <th>To</th>
+                    <th>Subject</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for email in emails %}
+                    <tr>
+                        <td class="muted">{{ email.created_at|date:"j M Y H:i" }}</td>
+                        <td><span class="badge badge--neutral">{{ email.get_kind_display }}</span></td>
+                        <td class="muted">{{ email.to_email }}</td>
+                        <td class="muted">{{ email.subject }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="empty-state">No emails have been sent about this student.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

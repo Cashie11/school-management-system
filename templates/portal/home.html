@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}My portal{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">My portal</h1>
+        <p class="page-lead">Students linked to your account.</p>
+    </div>
+</div>
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Admission number</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+                <tr>
+                    <td>{{ student.full_name }}</td>
+                    <td class="muted">{{ student.admission_number }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="btn btn-secondary btn-sm" href="{% url 'portal:student_exams' student.pk %}">Assessments</a>
+                            <a class="btn btn-secondary btn-sm" href="{% url 'portal:student_results' student.pk %}">Results</a>
+                            <a class="btn btn-secondary btn-sm" href="{% url 'portal:student_attendance' student.pk %}">Attendance</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3" class="empty-state">No students are linked to your account yet. Contact the school office.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<section class="section">
+    <div class="card-header">
+        <h2 class="card-title"><i class="bi bi-megaphone"></i> Announcements</h2>
+        <a class="btn btn-secondary btn-sm" href="{% url 'announcements:list' %}">View all</a>
+    </div>
+    {% include "announcements/_list.html" %}
+</section>
+{% endblock %}

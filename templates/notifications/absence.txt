@@ -1,0 +1,7 @@
+Absence recorded
+
+{{ student.full_name }} was marked {{ record.get_status_display|lower }} on {{ record.date|date:"j M Y" }}.
+{% if record.note %}
+Note from the school: {{ record.note }}
+{% endif %}
+Contact the school office if this is not correct.

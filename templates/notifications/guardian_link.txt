@@ -1,0 +1,7 @@
+You are now linked to {{ student.full_name }}
+
+Your account is linked to {{ student.full_name }} at {{ school.name }}.
+
+Sign in to your dashboard to view results, attendance and any assessments set for this student.
+
+If this is unexpected, contact the school office.

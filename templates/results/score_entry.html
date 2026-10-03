@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Scores{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">{{ assessment.name }}</h1>
+        <p class="page-lead">
+            {{ assessment.class_subject }} - {{ assessment.term }} - out of {{ assessment.max_score }}
+        </p>
+    </div>
+</div>
+
+{% include "results/_tabs.html" %}
+
+{% if not rows %}
+    <div class="card"><p class="muted">No students are enrolled in {{ assessment.class_subject.school_class }} for {{ assessment.term }}.</p></div>
+{% else %}
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th class="numeric">Score (out of {{ assessment.max_score }})</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>{{ row.student.full_name }}</td>
+                            <td class="numeric">
+                                <input type="number" step="0.01" min="0" max="{{ assessment.max_score }}" name="value_{{ row.student.pk }}" value="{{ row.value }}" style="max-width: 9rem; margin-left: auto;">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Save scores</button>
+            <span class="muted text-sm">Leave a field empty to clear that student's score.</span>
+        </div>
+    </form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,326 @@
+{% load static %}{% load asset %}{% load ui %}<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}School Management{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{% asset 'img/favicon.svg' %}">
+    <link rel="stylesheet" href="{% asset 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+    <link rel="stylesheet" href="{% asset 'css/app.css' %}">
+    <script src="{% asset 'vendor/htmx.min.js' %}" defer></script>
+</head>
+<body>
+<div class="app-shell">
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="{% url 'core:home' %}">
+                {% if active_school and active_school.logo %}
+                    <img class="brand-logo" src="{{ active_school.logo.url }}" alt="{{ active_school.name }}">
+                {% else %}
+                    <span class="brand-icon"><i class="bi bi-mortarboard-fill" aria-hidden="true"></i></span>
+                {% endif %}
+                <span class="brand-name">{{ active_school.name|default:"School Management" }}</span>
+            </a>
+
+            <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">
+                <i class="bi bi-list" aria-hidden="true"></i>
+                <span class="visually-hidden">Toggle navigation</span>
+            </button>
+
+            <div class="header-menu" id="site-nav" data-nav-menu>
+                {% if user.is_authenticated %}
+                    <nav class="nav-list">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'dashboard' and request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'dashboard:home' %}"><i class="bi bi-house-door"></i> Dashboard</a>
+                        <a class="nav-link {% if request.resolver_match.namespace == 'announcements' %}active{% endif %}" href="{% url 'announcements:list' %}"><i class="bi bi-megaphone"></i> Announcements</a>
+
+                        {% if user.is_school_admin or user.is_super_admin or user.is_teacher %}
+                            <div class="nav-group" data-nav-group>
+                                <button class="nav-link nav-trigger {% if request.resolver_match.namespace == 'students' or request.resolver_match.url_name == 'class_list' or request.resolver_match.url_name == 'class_detail' or request.resolver_match.namespace == 'attendance' %}active{% endif %}" type="button" data-nav-trigger aria-expanded="false">
+                                    <i class="bi bi-collection"></i> Classes <i class="bi bi-chevron-down nav-caret"></i>
+                                </button>
+                                <div class="nav-dropdown" data-nav-panel>
+                                    <a class="dropdown-link" href="{% url 'dashboard:class_list' %}"><i class="bi bi-collection"></i> My classes</a>
+                                    <a class="dropdown-link" href="{% url 'students:student_list' %}"><i class="bi bi-people"></i> Students</a>
+                                    <a class="dropdown-link" href="{% url 'students:enrollment_list' %}"><i class="bi bi-journal-check"></i> Enrollment</a>
+                                    <a class="dropdown-link" href="{% url 'attendance:register' %}"><i class="bi bi-calendar2-check"></i> Attendance</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if user.is_school_admin or user.is_super_admin %}
+                            <div class="nav-group" data-nav-group>
+                                <button class="nav-link nav-trigger {% if request.resolver_match.namespace == 'academics' %}active{% endif %}" type="button" data-nav-trigger aria-expanded="false">
+                                    <i class="bi bi-book"></i> Academics <i class="bi bi-chevron-down nav-caret"></i>
+                                </button>
+                                <div class="nav-dropdown" data-nav-panel>
+                                    <a class="dropdown-link" href="{% url 'academics:term_list' %}"><i class="bi bi-calendar3"></i> Terms</a>
+                                    <a class="dropdown-link" href="{% url 'academics:subject_list' %}"><i class="bi bi-book"></i> Subjects</a>
+                                    <a class="dropdown-link" href="{% url 'academics:class_list' %}"><i class="bi bi-collection"></i> Classes</a>
+                                    <a class="dropdown-link" href="{% url 'academics:assignment_list' %}"><i class="bi bi-person-video3"></i> Teacher assignments</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if user.is_school_admin or user.is_super_admin or user.is_teacher %}
+                            <div class="nav-group" data-nav-group>
+                                <button class="nav-link nav-trigger {% if request.resolver_match.namespace == 'results' %}active{% endif %}" type="button" data-nav-trigger aria-expanded="false">
+                                    <i class="bi bi-clipboard2-data"></i> Results <i class="bi bi-chevron-down nav-caret"></i>
+                                </button>
+                                <div class="nav-dropdown" data-nav-panel>
+                                    <a class="dropdown-link" href="{% url 'results:assessment_list' %}"><i class="bi bi-clipboard2-data"></i> Assessments</a>
+                                    <a class="dropdown-link" href="{% url 'results:report_card_select' %}"><i class="bi bi-file-earmark-text"></i> Report cards</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if user.is_school_admin or user.is_super_admin %}
+                            <div class="nav-group" data-nav-group>
+                                <button class="nav-link nav-trigger {% if request.resolver_match.url_name == 'staff_list' or request.resolver_match.url_name == 'parent_list' or request.resolver_match.url_name == 'discipline_list' %}active{% endif %}" type="button" data-nav-trigger aria-expanded="false">
+                                    <i class="bi bi-person-badge"></i> Accounts <i class="bi bi-chevron-down nav-caret"></i>
+                                </button>
+                                <div class="nav-dropdown" data-nav-panel>
+                                    <a class="dropdown-link" href="{% url 'accounts:staff_list' %}"><i class="bi bi-person-badge"></i> Staff</a>
+                                    <a class="dropdown-link" href="{% url 'accounts:parent_list' %}"><i class="bi bi-people"></i> Parents and Students</a>
+                                    <a class="dropdown-link" href="{% url 'students:discipline_list' %}"><i class="bi bi-shield-exclamation"></i> Discipline</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if user.is_super_admin %}
+                            <a class="nav-link {% if request.resolver_match.namespace == 'tenancy' %}active{% endif %}" href="{% url 'tenancy:school_list' %}"><i class="bi bi-buildings"></i> Schools</a>
+                        {% endif %}
+
+                        {% if user.is_parent_student %}
+                            <a class="nav-link {% if request.resolver_match.namespace == 'portal' %}active{% endif %}" href="{% url 'portal:home' %}"><i class="bi bi-mortarboard"></i> My portal</a>
+                        {% endif %}
+
+                        {% block nav %}{% endblock %}
+                    </nav>
+                {% endif %}
+
+                <div class="header-right">
+                    {% if active_school %}
+                        <span class="chip chip--accent"><i class="bi bi-building"></i> {{ active_school.name }}</span>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <div class="nav-group" data-nav-group>
+                            <button class="chip chip--button" type="button" data-nav-trigger aria-expanded="false">
+                                <i class="bi bi-person-circle"></i> Account <i class="bi bi-chevron-down nav-caret"></i>
+                            </button>
+                            <div class="nav-dropdown nav-dropdown--right" data-nav-panel>
+                                <div class="dropdown-header">
+                                    <strong>{{ user.email }}</strong>
+                                    {{ user.get_role_display }}
+                                </div>
+                                <a class="dropdown-link" href="{% url 'accounts:school_profile' %}"><i class="bi bi-building-gear"></i> School profile</a>
+                                <a class="dropdown-link" href="{% url 'accounts:password_change' %}"><i class="bi bi-shield-lock"></i> Change password</a>
+                                <form method="post" action="{% url 'accounts:logout' %}">
+                                    {% csrf_token %}
+                                    <button class="dropdown-link" type="submit"><i class="bi bi-box-arrow-right"></i> Sign out</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a class="nav-link" href="{% url 'accounts:login' %}"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
+                        <a class="btn btn-primary btn-sm" href="{% url 'accounts:signup' %}"><i class="bi bi-plus-circle"></i> Register a school</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            {% include "partials/_messages.html" %}
+            {% if not request.resolver_match.url_name|in_list:"home,login,signup,logout,password_reset,password_reset_done,password_reset_confirm,password_reset_complete,password_change,password_change_done" %}
+                <div class="back-row">
+                    <button class="btn btn-ghost btn-sm" type="button" data-back data-back-fallback="{% url 'dashboard:home' %}">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </button>
+                </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <span class="footer-note">School Management</span>
+            <span class="footer-note">Multi-tenant school administration</span>
+        </div>
+    </footer>
+</div>
+
+<script>
+    (function () {
+        var groups = Array.prototype.slice.call(document.querySelectorAll("[data-nav-group]"));
+        var mobile = window.matchMedia("(max-width: 1279px)");
+
+        // Label every table cell from its column header so tables can stack into
+        // cards on small screens. Done in script so no template needs data-labels.
+        function stackTables() {
+            document.querySelectorAll("table.table").forEach(function (table) {
+                if (table.classList.contains("table--stacked")) {
+                    return;
+                }
+                var headers = Array.prototype.map.call(
+                    table.querySelectorAll("thead th"),
+                    function (header) {
+                        return header.textContent.trim();
+                    }
+                );
+                table.querySelectorAll("tbody tr").forEach(function (row) {
+                    var cells = Array.prototype.slice.call(row.children);
+                    if (cells.length === 1) {
+                        cells[0].setAttribute("data-label", "");
+                        return;
+                    }
+                    cells.forEach(function (cell, index) {
+                        cell.setAttribute("data-label", headers[index] || "");
+                    });
+                });
+                table.classList.add("table--stacked");
+                var wrap = table.closest(".table-wrap");
+                if (wrap) {
+                    wrap.classList.add("table-wrap--stacked");
+                }
+            });
+        }
+
+        stackTables();
+        document.body.addEventListener("htmx:afterSwap", stackTables);
+
+        // Reveal elements as they scroll into view.
+        function setupReveal() {
+            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                return;
+            }
+            if (!("IntersectionObserver" in window)) {
+                return;
+            }
+            var selector = ".stat, .feature-card, .card, .section, .table-wrap, .auth-card, .page-head";
+            var targets = Array.prototype.slice.call(document.querySelectorAll(selector));
+            if (!targets.length) {
+                return;
+            }
+
+            var observer = new IntersectionObserver(
+                function (entries) {
+                    entries.forEach(function (entry) {
+                        if (!entry.isIntersecting) {
+                            return;
+                        }
+                        entry.target.classList.add("reveal--in");
+                        observer.unobserve(entry.target);
+                    });
+                },
+                { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+            );
+
+            targets.forEach(function (element, index) {
+                element.classList.add("reveal");
+                element.style.setProperty("--reveal-index", index % 6);
+                observer.observe(element);
+            });
+        }
+
+        setupReveal();
+        document.body.addEventListener("htmx:afterSwap", setupReveal);
+
+        // Give the sticky header a shadow once the page is scrolled.
+        var header = document.querySelector(".site-header");
+        if (header) {
+            var onScroll = function () {
+                header.classList.toggle("is-scrolled", window.scrollY > 8);
+            };
+            window.addEventListener("scroll", onScroll, { passive: true });
+            onScroll();
+        }
+
+        // Back control: use history when the previous page was on this site,
+        // otherwise fall back to the dashboard.
+        document.querySelectorAll("[data-back]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                var referrer = document.referrer || "";
+                var fromThisSite = referrer.indexOf(window.location.origin) === 0;
+                if (fromThisSite && window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.assign(button.dataset.backFallback || "/");
+                }
+            });
+        });
+
+        function closeAll() {
+            groups.forEach(function (group) {
+                group.classList.remove("is-open");
+                var trigger = group.querySelector("[data-nav-trigger]");
+                if (trigger) {
+                    trigger.setAttribute("aria-expanded", "false");
+                }
+            });
+        }
+
+        function openActiveGroup() {
+            if (!mobile.matches) {
+                return;
+            }
+            groups.forEach(function (group) {
+                var trigger = group.querySelector("[data-nav-trigger]");
+                if (trigger && trigger.classList.contains("active")) {
+                    group.classList.add("is-open");
+                    trigger.setAttribute("aria-expanded", "true");
+                }
+            });
+        }
+
+        groups.forEach(function (group) {
+            var trigger = group.querySelector("[data-nav-trigger]");
+            if (!trigger) {
+                return;
+            }
+            trigger.addEventListener("click", function (event) {
+                event.stopPropagation();
+                var willOpen = !group.classList.contains("is-open");
+                closeAll();
+                if (willOpen) {
+                    group.classList.add("is-open");
+                    trigger.setAttribute("aria-expanded", "true");
+                }
+            });
+        });
+
+        document.addEventListener("click", closeAll);
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                closeAll();
+            }
+        });
+
+        var toggle = document.querySelector("[data-nav-toggle]");
+        var menu = document.querySelector("[data-nav-menu]");
+        if (toggle && menu) {
+            toggle.addEventListener("click", function () {
+                var opened = menu.classList.toggle("is-open");
+                toggle.setAttribute("aria-expanded", opened ? "true" : "false");
+                var icon = toggle.querySelector("i");
+                if (icon) {
+                    icon.className = opened ? "bi bi-x-lg" : "bi bi-list";
+                }
+                if (opened) {
+                    openActiveGroup();
+                } else {
+                    closeAll();
+                }
+            });
+        }
+
+        window.addEventListener("resize", function () {
+            if (!mobile.matches) {
+                closeAll();
+            }
+        });
+    })();
+</script>
+</body>
+</html>

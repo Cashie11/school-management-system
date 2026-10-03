@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Staff{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Staff</h1>
+        <p class="page-lead">School Admins and Teachers in this school.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'accounts:staff_create' %}"><i class="bi bi-person-plus"></i> Add staff member</a>
+</div>
+
+{% include "accounts/_tabs.html" %}
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in staff %}
+                <tr>
+                    <td>{{ member.get_full_name|default:"-" }}</td>
+                    <td class="muted">{{ member.email }}</td>
+                    <td><span class="badge badge--neutral">{{ member.get_role_display }}</span></td>
+                    <td>
+                        {% if member.is_active %}
+                            <span class="badge badge--active">Active</span>
+                        {% else %}
+                            <span class="badge badge--expulsion">Suspended</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            {% if member.pk == user.pk %}
+                                <span class="muted text-sm">This is you</span>
+                            {% else %}
+                                <form class="inline-form" method="post" action="{% url 'accounts:user_toggle_active' member.pk %}">
+                                    {% csrf_token %}
+                                    {% if member.is_active %}
+                                        <button class="btn btn-secondary btn-sm" type="submit"><i class="bi bi-pause-circle"></i> Suspend</button>
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-sm" type="submit"><i class="bi bi-play-circle"></i> Reactivate</button>
+                                    {% endif %}
+                                </form>
+                                <a class="btn btn-ghost btn-sm" href="{% url 'accounts:user_delete' member.pk %}"><i class="bi bi-trash"></i> Remove</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="empty-state"><i class="bi bi-inbox"></i>No staff accounts yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include "partials/_pagination.html" with page=staff %}
+{% endblock %}

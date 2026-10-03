@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Schools{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Schools</h1>
+        <p class="page-lead">Every school on the platform. Open one to work inside its workspace.</p>
+    </div>
+</div>
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>School</th>
+                <th>Slug</th>
+                <th>Contact email</th>
+                <th>Status</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for school in schools %}
+                <tr>
+                    <td>{{ school.name }}</td>
+                    <td class="muted">{{ school.slug }}</td>
+                    <td class="muted">{{ school.email }}</td>
+                    <td>
+                        {% if school.is_active %}
+                            <span class="badge badge--active">Active</span>
+                        {% else %}
+                            <span class="badge badge--neutral">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <form class="inline-form" method="post" action="{% url 'tenancy:school_open' school.pk %}">
+                                {% csrf_token %}
+                                <button class="btn btn-secondary btn-sm" type="submit">Open</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">No schools have been registered yet.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

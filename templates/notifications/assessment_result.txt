@@ -1,0 +1,7 @@
+Result ready
+
+{{ assessment.name }} for {{ student.full_name }} has been marked.
+
+Score: {{ submission.total_score }} / {{ assessment.max_score }}
+
+Sign in to the portal for the full breakdown.

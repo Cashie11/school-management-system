@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Enrollment{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Enrollment</h1>
+        <p class="page-lead">Each student is enrolled in one class per term.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'students:enrollment_create' %}"><i class="bi bi-journal-plus"></i> Enroll student</a>
+</div>
+
+{% include "students/_tabs.html" %}
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Class</th>
+                <th>Term</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enrollment in enrollments %}
+                <tr>
+                    <td><a href="{% url 'students:student_detail' enrollment.student.pk %}">{{ enrollment.student.full_name }}</a></td>
+                    <td>{{ enrollment.school_class }}</td>
+                    <td class="muted">{{ enrollment.term }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="btn btn-ghost btn-sm" href="{% url 'students:enrollment_delete' enrollment.pk %}">Remove</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="empty-state">No enrollments yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include "partials/_pagination.html" with page=enrollments %}
+{% endblock %}

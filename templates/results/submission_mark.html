@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Mark theory{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Mark theory</h1>
+        <p class="page-lead">{{ submission.student.full_name }} - {{ submission.assessment.name }}</p>
+    </div>
+</div>
+
+{% if not theory_answers %}
+    <div class="card"><p class="muted">This assessment has no theory questions. Marking is complete.</p></div>
+{% else %}
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="stack">
+            {% for answer in theory_answers %}
+                <div class="card card--white">
+                    <p class="muted text-sm">Question {{ answer.question.order }} - {{ answer.question.points }} points</p>
+                    <p style="margin: 0.5rem 0 0.75rem;">{{ answer.question.text }}</p>
+                    <div class="card" style="background: var(--background-surface-dp);">
+                        <p class="muted text-sm">Student answer</p>
+                        <p>{{ answer.text_answer|default:"No answer given."|linebreaksbr }}</p>
+                    </div>
+                    <div class="form-field" style="margin-top: 1rem; max-width: 14rem;">
+                        <label for="points_{{ answer.pk }}">Mark awarded (out of {{ answer.question.points }})</label>
+                        <input type="number" step="0.01" min="0" max="{{ answer.question.points }}" id="points_{{ answer.pk }}" name="points_{{ answer.pk }}" value="{{ answer.awarded_points|default_if_none:'' }}">
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Save marks</button>
+            <a class="btn btn-secondary" href="{% url 'results:submission_list' submission.assessment_id %}">Cancel</a>
+        </div>
+    </form>
+{% endif %}
+{% endblock %}

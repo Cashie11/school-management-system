@@ -1,0 +1,4 @@
+<nav class="tabs">
+    <a class="nav-link {% if active == 'register' %}active{% endif %}" href="{% url 'attendance:register' %}"><i class="bi bi-calendar2-check"></i> Daily register</a>
+    <a class="nav-link {% if active == 'records' %}active{% endif %}" href="{% url 'attendance:record_list' %}"><i class="bi bi-list-check"></i> Records</a>
+</nav>

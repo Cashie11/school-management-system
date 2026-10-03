@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Register a school{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+    <div class="auth-card">
+        <h1 class="card-title">Register a school</h1>
+        <p class="card-subtitle">This creates the school and its first administrator account.</p>
+
+        <form class="auth-form" method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {% include "partials/_form_errors.html" %}
+
+            <div class="form-field {% if form.school_name.errors %}has-error{% endif %}">
+                <label for="{{ form.school_name.id_for_label }}">School name</label>
+                {{ form.school_name }}
+                {{ form.school_name.errors }}
+            </div>
+            <div class="form-field {% if form.school_email.errors %}has-error{% endif %}">
+                <label for="{{ form.school_email.id_for_label }}">School contact email</label>
+                {{ form.school_email }}
+                {{ form.school_email.errors }}
+            </div>
+            <div class="form-field {% if form.logo.errors %}has-error{% endif %}">
+                <label for="{{ form.logo.id_for_label }}">School logo (optional)</label>
+                {{ form.logo }}
+                {% if form.logo.help_text %}<p class="help-text">{{ form.logo.help_text }}</p>{% endif %}
+                {{ form.logo.errors }}
+            </div>
+            <div class="form-field {% if form.admin_email.errors %}has-error{% endif %}">
+                <label for="{{ form.admin_email.id_for_label }}">Administrator email</label>
+                {{ form.admin_email }}
+                {{ form.admin_email.errors }}
+            </div>
+            <div class="form-field {% if form.password1.errors %}has-error{% endif %}">
+                <label for="{{ form.password1.id_for_label }}">Password</label>
+                {{ form.password1 }}
+                {{ form.password1.errors }}
+            </div>
+            <div class="form-field {% if form.password2.errors %}has-error{% endif %}">
+                <label for="{{ form.password2.id_for_label }}">Confirm password</label>
+                {{ form.password2 }}
+                {{ form.password2.errors }}
+            </div>
+
+            <button class="btn btn-primary" type="submit">Create school</button>
+        </form>
+
+        <p class="auth-foot">Already registered? <a href="{% url 'accounts:login' %}">Sign in</a>.</p>
+    </div>
+</div>
+{% endblock %}

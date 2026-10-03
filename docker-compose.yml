@@ -1,0 +1,83 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-school_management}
+      POSTGRES_USER: ${POSTGRES_USER:-school_management}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-school_management}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-school_management}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    command: redis-server --save "" --appendonly no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py migrate --noinput &&
+             gunicorn config.wsgi:application -c gunicorn.conf.py"
+    environment: &app-env
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env or the environment}
+      DJANGO_DEBUG: "0"
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      # No TLS in front of this stack, so the HTTPS redirect stays off. Set it to
+      # 1 once a certificate and proxy are in place.
+      DJANGO_SECURE_SSL_REDIRECT: ${DJANGO_SECURE_SSL_REDIRECT:-0}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      POSTGRES_DB: ${POSTGRES_DB:-school_management}
+      POSTGRES_USER: ${POSTGRES_USER:-school_management}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-school_management}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+    ports:
+      - "8000:8000"
+    volumes:
+      # Uploaded school logos live outside the container so they survive a rebuild.
+      - media_data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: celery -A config worker --loglevel=info --concurrency=4
+    environment: *app-env
+    volumes:
+      - media_data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  beat:
+    build: .
+    command: celery -A config beat --loglevel=info
+    environment: *app-env
+    volumes:
+      - media_data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  media_data:

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}My teaching{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">My teaching</h1>
+        <p class="page-lead">The classes, subjects and students assigned to you.</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url 'dashboard:class_list' %}"><i class="bi bi-collection"></i> My classes</a>
+</div>
+
+<div class="stat-grid">
+    <a class="stat stat--accent" href="{% url 'dashboard:class_list' %}">
+        <span class="stat-icon"><i class="bi bi-collection"></i></span>
+        <div class="stat-value">{{ class_count }}</div>
+        <div class="stat-label">Classes</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat" href="{% url 'dashboard:class_list' %}">
+        <span class="stat-icon"><i class="bi bi-book"></i></span>
+        <div class="stat-value">{{ subject_count }}</div>
+        <div class="stat-label">Subjects I teach</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat" href="{% url 'students:student_list' %}">
+        <span class="stat-icon"><i class="bi bi-people"></i></span>
+        <div class="stat-value">{{ student_count }}</div>
+        <div class="stat-label">Students</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat stat--dark" href="{% url 'results:assessment_list' %}">
+        <span class="stat-icon"><i class="bi bi-clipboard2-data"></i></span>
+        <div class="stat-value">{{ assessment_count }}</div>
+        <div class="stat-label">Assessments</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+</div>
+
+<section class="section">
+    <div class="card-header">
+        <h2 class="card-title"><i class="bi bi-book"></i> My subjects</h2>
+        <a class="btn btn-primary btn-sm" href="{% url 'results:assessment_create' %}"><i class="bi bi-plus-lg"></i> Add assessment</a>
+    </div>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th class="numeric">Students</th>
+                    <th class="numeric">Assessments</th>
+                    <th class="numeric">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{ row.class_subject.school_class }}</td>
+                        <td>{{ row.class_subject.subject }}</td>
+                        <td class="numeric">{{ row.student_count }}</td>
+                        <td class="numeric">{{ row.assessment_count }}</td>
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-secondary btn-sm" href="{% url 'dashboard:class_detail' row.class_subject.school_class.pk %}"><i class="bi bi-box-arrow-up-right"></i> Open class</a>
+                                <a class="btn btn-secondary btn-sm" href="{% url 'attendance:register' %}?school_class={{ row.class_subject.school_class.pk }}"><i class="bi bi-calendar2-check"></i> Attendance</a>
+                                <a class="btn btn-secondary btn-sm" href="{% url 'students:student_list' %}"><i class="bi bi-people"></i> Students</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="empty-state"><i class="bi bi-inbox"></i>You have no class assignments yet. Ask the school administrator to assign you a subject.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <div class="card-header">
+        <h2 class="card-title"><i class="bi bi-clipboard2-data"></i> My assessments</h2>
+        <a class="btn btn-primary btn-sm" href="{% url 'results:assessment_create' %}"><i class="bi bi-plus-lg"></i> Add assessment</a>
+    </div>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Assessment</th>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Term</th>
+                    <th>Mode</th>
+                    <th class="numeric">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assessment in assessments %}
+                    <tr>
+                        <td>{{ assessment.name }}</td>
+                        <td>{{ assessment.class_subject.school_class }}</td>
+                        <td>{{ assessment.class_subject.subject }}</td>
+                        <td class="muted">{{ assessment.term }}</td>
+                        <td>
+                            {% if assessment.is_online %}
+                                <span class="badge badge--neutral"><i class="bi bi-wifi"></i> Online{% if assessment.is_published %} - published{% endif %}</span>
+                            {% else %}
+                                <span class="badge badge--neutral"><i class="bi bi-pencil"></i> Manual</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                {% if assessment.is_online %}
+                                    <a class="btn btn-primary btn-sm" href="{% url 'results:assessment_questions' assessment.pk %}"><i class="bi bi-question-circle"></i> Questions</a>
+                                    <a class="btn btn-secondary btn-sm" href="{% url 'results:submission_list' assessment.pk %}"><i class="bi bi-inbox"></i> Submissions</a>
+                                {% else %}
+                                    <a class="btn btn-primary btn-sm" href="{% url 'results:score_entry' assessment.pk %}"><i class="bi bi-pencil-square"></i> Scores</a>
+                                    <a class="btn btn-secondary btn-sm" href="{% url 'results:assessment_questions' assessment.pk %}"><i class="bi bi-question-circle"></i> Questions</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6" class="empty-state"><i class="bi bi-clipboard2-plus"></i>No assessments yet. Use "Add assessment" to create one.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <div class="card-header">
+        <h2 class="card-title"><i class="bi bi-megaphone"></i> Announcements</h2>
+        <div class="row">
+            <a class="btn btn-primary btn-sm" href="{% url 'announcements:create' %}"><i class="bi bi-plus-lg"></i> New announcement</a>
+            <a class="btn btn-secondary btn-sm" href="{% url 'announcements:list' %}">View all</a>
+        </div>
+    </div>
+    {% include "announcements/_list.html" %}
+</section>
+{% endblock %}

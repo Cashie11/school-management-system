@@ -1,0 +1,43 @@
+{% if announcements %}
+    <div class="stack">
+        {% for announcement in announcements %}
+            <article class="announcement {% if announcement.is_pinned %}announcement--pinned{% endif %}">
+                <h3 class="announcement-title">
+                    {% if announcement.is_pinned %}<i class="bi bi-pin-angle-fill" aria-hidden="true"></i>{% endif %}
+                    {{ announcement.title }}
+                </h3>
+
+                <p class="announcement-meta">
+                    <span class="badge badge--{{ announcement.audience }}">{{ announcement.get_audience_display }}</span>
+                    {% if announcement.school_class %}
+                        <span class="badge badge--neutral">{{ announcement.school_class }}</span>
+                    {% endif %}
+                    <span class="meta"><i class="bi bi-clock" aria-hidden="true"></i>{{ announcement.created_at|date:"j M Y, H:i" }}</span>
+                    {% if announcement.author %}
+                        <span class="meta"><i class="bi bi-person" aria-hidden="true"></i>{{ announcement.author.get_full_name|default:announcement.author.email }}</span>
+                    {% endif %}
+                </p>
+
+                <div class="announcement-body">{{ announcement.body }}</div>
+
+                {% if announcement.expires_at %}
+                    <p class="announcement-expiry">
+                        <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+                        Shown until {{ announcement.expires_at|date:"j M Y, H:i" }}
+                    </p>
+                {% endif %}
+
+                {% if show_actions %}
+                    <div class="announcement-actions">
+                        <a class="btn btn-secondary btn-sm" href="{% url 'announcements:edit' announcement.pk %}"><i class="bi bi-pencil"></i> Edit</a>
+                        <a class="btn btn-ghost btn-sm" href="{% url 'announcements:delete' announcement.pk %}"><i class="bi bi-trash"></i> Delete</a>
+                    </div>
+                {% endif %}
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card">
+        <p class="empty-state"><i class="bi bi-megaphone"></i>No announcements right now.</p>
+    </div>
+{% endif %}

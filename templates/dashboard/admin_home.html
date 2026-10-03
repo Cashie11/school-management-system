@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-lead">
+            {% if active_school %}<i class="bi bi-building"></i> {{ active_school.name }}{% endif %}
+            {% if term %} &middot; {{ term }}{% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="stat-grid">
+    <a class="stat stat--accent" href="{% url 'students:student_list' %}">
+        <span class="stat-icon"><i class="bi bi-people"></i></span>
+        <div class="stat-value">{{ student_count }}</div>
+        <div class="stat-label">Students</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat" href="{% url 'accounts:staff_list' %}">
+        <span class="stat-icon"><i class="bi bi-person-video3"></i></span>
+        <div class="stat-value">{{ teacher_count }}</div>
+        <div class="stat-label">Teachers</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat" href="{% url 'academics:class_list' %}">
+        <span class="stat-icon"><i class="bi bi-collection"></i></span>
+        <div class="stat-value">{{ class_count }}</div>
+        <div class="stat-label">Classes</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat" href="{% url 'academics:subject_list' %}">
+        <span class="stat-icon"><i class="bi bi-book"></i></span>
+        <div class="stat-value">{{ subject_count }}</div>
+        <div class="stat-label">Subjects</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat" href="{% url 'results:assessment_list' %}">
+        <span class="stat-icon"><i class="bi bi-clipboard2-data"></i></span>
+        <div class="stat-value">{{ assessment_count }}</div>
+        <div class="stat-label">Assessments</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat stat--dark" href="{% url 'attendance:record_list' %}?date={{ today|date:'Y-m-d' }}">
+        <span class="stat-icon"><i class="bi bi-calendar2-check"></i></span>
+        <div class="stat-value">{{ today_attendance }}</div>
+        <div class="stat-label">Marked today</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+</div>
+
+<section class="section">
+    <h2 class="section-title"><i class="bi bi-grid"></i> Manage</h2>
+    <div class="feature-grid">
+        <a class="card feature-card" href="{% url 'students:student_list' %}">
+            <span class="card-icon"><i class="bi bi-people"></i></span>
+            <h3>Students</h3>
+            <p>Records, enrollment and guardians.</p>
+        </a>
+        <a class="card feature-card" href="{% url 'academics:term_list' %}">
+            <span class="card-icon"><i class="bi bi-book"></i></span>
+            <h3>Academics</h3>
+            <p>Terms, subjects, classes and teacher assignments.</p>
+        </a>
+        <a class="card feature-card" href="{% url 'attendance:register' %}">
+            <span class="card-icon"><i class="bi bi-calendar2-check"></i></span>
+            <h3>Attendance</h3>
+            <p>Daily register and records.</p>
+        </a>
+        <a class="card feature-card" href="{% url 'results:assessment_list' %}">
+            <span class="card-icon"><i class="bi bi-clipboard2-data"></i></span>
+            <h3>Results</h3>
+            <p>Assessments, scores and report cards.</p>
+        </a>
+        <a class="card feature-card" href="{% url 'accounts:staff_list' %}">
+            <span class="card-icon"><i class="bi bi-person-badge"></i></span>
+            <h3>Accounts</h3>
+            <p>Staff and parent accounts.</p>
+        </a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="card-header">
+        <h2 class="card-title"><i class="bi bi-megaphone"></i> Announcements</h2>
+        <div class="row">
+            {% if not user.is_parent_student %}
+                <a class="btn btn-primary btn-sm" href="{% url 'announcements:create' %}"><i class="bi bi-plus-lg"></i> New announcement</a>
+            {% endif %}
+            <a class="btn btn-secondary btn-sm" href="{% url 'announcements:list' %}">View all</a>
+        </div>
+    </div>
+    {% include "announcements/_list.html" %}
+</section>
+{% endblock %}

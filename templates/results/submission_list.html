@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Submissions{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">{{ assessment.name }} submissions</h1>
+        <p class="page-lead">{{ assessment.class_subject }} - {{ assessment.term }}</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url 'results:assessment_questions' assessment.pk %}">Questions</a>
+</div>
+
+{% include "results/_tabs.html" %}
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Status</th>
+                <th class="numeric">Objective</th>
+                <th class="numeric">Theory</th>
+                <th class="numeric">Total</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr>
+                    <td>{{ row.student.full_name }}</td>
+                    <td>
+                        {% if not row.submission %}
+                            <span class="badge badge--neutral">Not started</span>
+                        {% elif row.submission.status == "in_progress" %}
+                            <span class="badge badge--late">In progress</span>
+                        {% elif row.submission.status == "submitted" %}
+                            <span class="badge badge--late">Awaiting marking</span>
+                        {% else %}
+                            <span class="badge badge--active">Marked</span>
+                        {% endif %}
+                    </td>
+                    <td class="numeric">{{ row.submission.objective_score|default:"-" }}</td>
+                    <td class="numeric">{{ row.submission.theory_score|default:"-" }}</td>
+                    <td class="numeric">{% if row.submission.status == "marked" %}{{ row.submission.total_score }}{% else %}-{% endif %}</td>
+                    <td>
+                        <div class="table-actions">
+                            {% if row.submission and row.submission.status == "submitted" %}
+                                <a class="btn btn-primary btn-sm" href="{% url 'results:submission_mark' row.submission.pk %}">Mark theory</a>
+                            {% endif %}
+                            {% if row.submission %}
+                                <form method="post" action="{% url 'results:submission_reset' row.submission.pk %}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-ghost btn-sm" type="submit">Reset</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="empty-state">No students are enrolled in this class for the term.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

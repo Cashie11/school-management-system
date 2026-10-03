@@ -1,0 +1,46 @@
+{% extends "notifications/_email_base.html" %}
+
+{% block content %}
+    <h1 style="margin:0 0 12px;font-size:22px;">Results for {{ student.full_name }}</h1>
+    <p style="margin:0 0 12px;">{{ report.term.name }} at {{ school.name }}{% if report.school_class %} - {{ report.school_class }}{% endif %}.</p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:14px;margin:16px 0;">
+        <tr>
+            <th align="left" style="background:#2c2c2c;color:#ffffff;padding:10px 12px;">Subject</th>
+            <th align="right" style="background:#2c2c2c;color:#ffffff;padding:10px 12px;">Score</th>
+            <th align="right" style="background:#2c2c2c;color:#ffffff;padding:10px 12px;">Out of</th>
+            <th align="right" style="background:#2c2c2c;color:#ffffff;padding:10px 12px;">Percentage</th>
+            <th align="right" style="background:#2c2c2c;color:#ffffff;padding:10px 12px;">Grade</th>
+        </tr>
+        {% for subject in report.subjects %}
+            <tr>
+                <td style="padding:9px 12px;border-bottom:1px solid #e4e4e0;">{{ subject.subject }}</td>
+                <td align="right" style="padding:9px 12px;border-bottom:1px solid #e4e4e0;">{{ subject.obtained }}</td>
+                <td align="right" style="padding:9px 12px;border-bottom:1px solid #e4e4e0;">{{ subject.possible }}</td>
+                <td align="right" style="padding:9px 12px;border-bottom:1px solid #e4e4e0;">{% if subject.percentage is not None %}{{ subject.percentage }}%{% else %}-{% endif %}</td>
+                <td align="right" style="padding:9px 12px;border-bottom:1px solid #e4e4e0;">{% if subject.grade %}{{ subject.grade.0 }}{% else %}-{% endif %}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5" style="padding:12px;">No scores were recorded for this term.</td></tr>
+        {% endfor %}
+    </table>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:14px;margin:16px 0;">
+        <tr>
+            <td style="padding:4px 16px 4px 0;color:#8a8f98;">Overall</td>
+            <td style="padding:4px 0;font-weight:bold;">{% if report.overall is not None %}{{ report.overall }}%{% else %}-{% endif %}{% if report.grade %} ({{ report.grade.0 }} - {{ report.grade.1 }}){% endif %}</td>
+        </tr>
+        <tr>
+            <td style="padding:4px 16px 4px 0;color:#8a8f98;">Total</td>
+            <td style="padding:4px 0;font-weight:bold;">{{ report.total_obtained }} / {{ report.total_possible }}</td>
+        </tr>
+        {% if position %}
+            <tr>
+                <td style="padding:4px 16px 4px 0;color:#8a8f98;">Position</td>
+                <td style="padding:4px 0;font-weight:bold;">{{ position }} of {{ class_size }}</td>
+            </tr>
+        {% endif %}
+    </table>
+
+    <p style="margin:0;color:#8a8f98;font-size:13px;">Sign in to the portal to download the report card as a PDF.</p>
+{% endblock %}

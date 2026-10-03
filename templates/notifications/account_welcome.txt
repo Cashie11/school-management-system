@@ -1,0 +1,8 @@
+Your account is ready
+
+An account has been created for you at {{ school.name }}.
+
+Sign in with: {{ user.email }}
+Role: {{ role }}
+
+Use the password set by the school office. Change it after your first sign in.

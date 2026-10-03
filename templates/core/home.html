@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}School Management{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <p class="eyebrow">Multi-tenant school platform</p>
+    <h1 class="title-h1">One workspace per school, isolated at every query.</h1>
+    <p class="hero-lead">
+        Manage classes, subjects, teacher assignments, student records, attendance and results.
+        Each school sees only its own data, enforced at the database query layer.
+    </p>
+    <div class="hero-actions">
+        <a class="btn btn-primary" href="{% url 'accounts:signup' %}">Register a school</a>
+        <a class="btn btn-secondary" href="{% url 'accounts:login' %}">Sign in</a>
+    </div>
+</section>
+
+<section class="feature-grid">
+    <article class="card feature-card">
+        <h3>Classes and subjects</h3>
+        <p>Define classes and subjects, then assign teachers to each class subject.</p>
+    </article>
+    <article class="card feature-card">
+        <h3>Student records</h3>
+        <p>Keep student records and enrollment history for every term.</p>
+    </article>
+    <article class="card feature-card">
+        <h3>Attendance</h3>
+        <p>Record daily attendance by class and review it per student.</p>
+    </article>
+    <article class="card feature-card">
+        <h3>Results and report cards</h3>
+        <p>Enter scores against assessments and generate report cards as PDF.</p>
+    </article>
+</section>
+{% endblock %}

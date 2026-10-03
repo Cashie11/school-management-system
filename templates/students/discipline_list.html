@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Discipline{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Discipline</h1>
+        <p class="page-lead">Sanctions recorded against students. The family is notified by email.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'students:discipline_create' %}"><i class="bi bi-shield-exclamation"></i> Record sanction</a>
+</div>
+
+{% include "students/_tabs.html" %}
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Sanction</th>
+                <th>From</th>
+                <th>Until</th>
+                <th>Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+                <tr>
+                    <td>{{ record.student.full_name }}</td>
+                    <td><span class="badge badge--{{ record.kind }}">{{ record.get_kind_display }}</span></td>
+                    <td class="muted">{{ record.start_date|date:"j M Y"|default:"-" }}</td>
+                    <td class="muted">
+                        {% if record.end_date %}{{ record.end_date|date:"j M Y" }}{% elif record.is_permanent %}Permanent{% else %}-{% endif %}
+                    </td>
+                    <td class="muted">{{ record.reason|truncatechars:80 }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="empty-state">No sanctions have been recorded.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

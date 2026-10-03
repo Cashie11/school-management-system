@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Platform{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Platform</h1>
+        <p class="page-lead">Every school on the platform. Open one to work inside it.</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url 'tenancy:school_list' %}">Manage schools</a>
+</div>
+
+<div class="stat-grid">
+    <a class="stat stat--accent" href="{% url 'tenancy:school_list' %}">
+        <span class="stat-icon"><i class="bi bi-buildings"></i></span>
+        <div class="stat-value">{{ school_count }}</div>
+        <div class="stat-label">Schools</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat" href="{% url 'tenancy:school_list' %}">
+        <span class="stat-icon"><i class="bi bi-check2-circle"></i></span>
+        <div class="stat-value">{{ active_school_count }}</div>
+        <div class="stat-label">Active schools</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat" href="{% url 'tenancy:school_list' %}">
+        <span class="stat-icon"><i class="bi bi-people"></i></span>
+        <div class="stat-value">{{ total_students }}</div>
+        <div class="stat-label">Students</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat stat--dark" href="{% url 'tenancy:school_list' %}">
+        <span class="stat-icon"><i class="bi bi-person-badge"></i></span>
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-label">Accounts</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+</div>
+
+<section class="section">
+    <h2 class="section-title">Schools</h2>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>School</th>
+                    <th class="numeric">Students</th>
+                    <th class="numeric">Classes</th>
+                    <th class="numeric">Staff</th>
+                    <th class="numeric">Parents</th>
+                    <th class="numeric">Assessments</th>
+                    <th>Status</th>
+                    <th class="numeric">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{ row.school.name }}</td>
+                        <td class="numeric">{{ row.students }}</td>
+                        <td class="numeric">{{ row.classes }}</td>
+                        <td class="numeric">{{ row.staff }}</td>
+                        <td class="numeric">{{ row.parents }}</td>
+                        <td class="numeric">{{ row.assessments }}</td>
+                        <td>
+                            {% if row.school.is_active %}
+                                <span class="badge badge--active">Active</span>
+                            {% else %}
+                                <span class="badge badge--neutral">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <form class="inline-form" method="post" action="{% url 'tenancy:school_open' row.school.pk %}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-secondary btn-sm" type="submit">Open</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="8" class="empty-state">No schools have been registered yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

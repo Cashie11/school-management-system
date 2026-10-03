@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Assessments{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Assessments</h1>
+        <p class="page-lead">Graded work for each class subject, within a term.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'results:assessment_create' %}"><i class="bi bi-plus-lg"></i> Add assessment</a>
+</div>
+
+{% include "results/_tabs.html" %}
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Class</th>
+                <th>Subject</th>
+                <th>Term</th>
+                <th>Assessment</th>
+                <th class="numeric">Max score</th>
+                <th>Mode</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for assessment in assessments %}
+                <tr>
+                    <td>{{ assessment.class_subject.school_class }}</td>
+                    <td>{{ assessment.class_subject.subject }}</td>
+                    <td class="muted">{{ assessment.term }}</td>
+                    <td>{{ assessment.name }}</td>
+                    <td class="numeric">{{ assessment.max_score }}</td>
+                    <td>
+                        {% if assessment.is_online %}
+                            <span class="badge badge--neutral">Online{% if assessment.is_published %} - published{% endif %}</span>
+                        {% else %}
+                            <span class="badge badge--neutral">Manual</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            {% if assessment.is_online %}
+                                <a class="btn btn-primary btn-sm" href="{% url 'results:assessment_questions' assessment.pk %}">Questions</a>
+                                <a class="btn btn-secondary btn-sm" href="{% url 'results:submission_list' assessment.pk %}">Submissions</a>
+                            {% else %}
+                                <a class="btn btn-primary btn-sm" href="{% url 'results:score_entry' assessment.pk %}">Scores</a>
+                                <a class="btn btn-secondary btn-sm" href="{% url 'results:assessment_questions' assessment.pk %}">Questions</a>
+                            {% endif %}
+                            <a class="btn btn-secondary btn-sm" href="{% url 'results:assessment_edit' assessment.pk %}">Edit</a>
+                            <a class="btn btn-ghost btn-sm" href="{% url 'results:assessment_delete' assessment.pk %}">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="empty-state">No assessments yet. Add classes, subjects and teacher assignments first.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

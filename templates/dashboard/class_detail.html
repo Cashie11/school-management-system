@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}{{ school_class }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">{{ school_class }}</h1>
+        <p class="page-lead">Level {{ school_class.level }}</p>
+    </div>
+    <div class="row">
+        <a class="btn btn-secondary" href="{% url 'attendance:register' %}?school_class={{ school_class.pk }}">Take attendance</a>
+        <a class="btn btn-primary" href="{% url 'results:assessment_create' %}">Add assessment</a>
+    </div>
+</div>
+
+<div class="grid-2">
+    <section class="card card--white">
+        <h2 class="card-title">Subjects</h2>
+        <dl class="detail-list">
+            {% for class_subject in class_subjects %}
+                <dt>{{ class_subject.subject }}</dt>
+                <dd>{% if class_subject.teacher %}{{ class_subject.teacher.get_full_name|default:class_subject.teacher.email }}{% else %}Unassigned{% endif %}</dd>
+            {% empty %}
+                <dt>Subjects</dt>
+                <dd>None assigned</dd>
+            {% endfor %}
+        </dl>
+    </section>
+
+    <section class="card card--white">
+        <h2 class="card-title">Assessments</h2>
+        <dl class="detail-list">
+            {% for assessment in assessments %}
+                <dt>{{ assessment.name }}</dt>
+                <dd>{{ assessment.class_subject.subject }} - {{ assessment.term }}</dd>
+            {% empty %}
+                <dt>Assessments</dt>
+                <dd>None yet</dd>
+            {% endfor %}
+        </dl>
+    </section>
+</div>
+
+<section class="section">
+    <div class="card-header">
+        <h2 class="card-title">Students</h2>
+        <a class="btn btn-secondary btn-sm" href="{% url 'students:student_list' %}">All my students</a>
+    </div>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Admission number</th>
+                    <th>Term</th>
+                    <th class="numeric">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for enrollment in enrollments %}
+                    <tr>
+                        <td>{{ enrollment.student.full_name }}</td>
+                        <td class="muted">{{ enrollment.student.admission_number }}</td>
+                        <td class="muted">{{ enrollment.term }}</td>
+                        <td>
+                            <div class="table-actions">
+                                <a class="btn btn-secondary btn-sm" href="{% url 'students:student_detail' enrollment.student.pk %}">View</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="empty-state">No students are enrolled in this class yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

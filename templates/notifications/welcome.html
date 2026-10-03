@@ -1,0 +1,14 @@
+{% extends "notifications/_email_base.html" %}
+
+{% block content %}
+    <h1 style="margin:0 0 12px;font-size:22px;">Welcome, {{ student.full_name }}</h1>
+    <p style="margin:0 0 12px;">You have been registered at {{ school.name }}.</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px 0;font-size:15px;">
+        <tr>
+            <td style="padding:4px 16px 4px 0;color:#8a8f98;">Admission number</td>
+            <td style="padding:4px 0;font-weight:bold;">{{ student.admission_number }}</td>
+        </tr>
+    </table>
+    <p style="margin:0 0 12px;">Your guardian signs in to the portal to follow your results, attendance and assessments.</p>
+    <p style="margin:0;color:#8a8f98;font-size:13px;">If you were not expecting this message, contact the school office.</p>
+{% endblock %}

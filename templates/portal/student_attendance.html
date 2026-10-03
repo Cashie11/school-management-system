@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">{{ student.full_name }} - attendance</h1>
+        <p class="page-lead">Attendance recorded for this student.</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url 'portal:home' %}">Back</a>
+</div>
+
+{% include "portal/_student_tabs.html" %}
+
+<div class="stat-grid">
+    <a class="stat stat--accent" href="?status=present">
+        <span class="stat-icon"><i class="bi bi-check2-circle"></i></span>
+        <div class="stat-value">{{ summary.present|default:"0" }}</div>
+        <div class="stat-label">Present</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat stat--dark" href="?status=absent">
+        <span class="stat-icon"><i class="bi bi-x-circle"></i></span>
+        <div class="stat-value">{{ summary.absent|default:"0" }}</div>
+        <div class="stat-label">Absent</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat" href="?status=late">
+        <span class="stat-icon"><i class="bi bi-clock-history"></i></span>
+        <div class="stat-value">{{ summary.late|default:"0" }}</div>
+        <div class="stat-label">Late</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+    <a class="stat" href="?status=excused">
+        <span class="stat-icon"><i class="bi bi-shield-check"></i></span>
+        <div class="stat-value">{{ summary.excused|default:"0" }}</div>
+        <div class="stat-label">Excused</div>
+        <i class="bi bi-arrow-right stat-arrow"></i>
+    </a>
+</div>
+
+<form class="filter-bar" method="get" style="margin-top: 1.5rem;">
+    <div class="form-field">
+        <label for="term">Term</label>
+        <select id="term" name="term">
+            <option value="">All terms</option>
+            {% for term in terms %}
+                <option value="{{ term.pk }}" {% if selected_term|stringformat:"s" == term.pk|stringformat:"s" %}selected{% endif %}>{{ term }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-field">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+            <option value="">All statuses</option>
+            {% for value, label in statuses %}
+                <option value="{{ value }}" {% if value == status %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-field">
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" value="{{ date|date:'Y-m-d' }}">
+    </div>
+    <button class="btn btn-secondary" type="submit">Filter</button>
+    <a class="btn btn-ghost" href="{% url 'portal:student_attendance' student.pk %}">Clear</a>
+</form>
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Term</th>
+                <th>Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+                <tr>
+                    <td>{{ record.date|date:"j M Y" }}</td>
+                    <td><span class="badge badge--{{ record.status }}">{{ record.get_status_display }}</span></td>
+                    <td class="muted">{{ record.term }}</td>
+                    <td class="muted">{{ record.note|default:"-" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="empty-state">No attendance records match the filters.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

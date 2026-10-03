@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{{ assessment.name }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">{{ assessment.name }}</h1>
+        <p class="page-lead">{{ assessment.class_subject.subject }} - {{ assessment.term }} - total {{ assessment.max_score }} points</p>
+        {% if submission.expires_at %}
+            <p class="muted text-sm" id="exam-timer" data-expires="{{ submission.expires_at|date:'c' }}">Time remaining: calculating...</p>
+        {% endif %}
+    </div>
+</div>
+
+<form method="post" id="exam-form" novalidate>
+    {% csrf_token %}
+
+    {% if objective_rows %}
+        <section class="section">
+            <h2 class="section-title">Section A - Objective</h2>
+            <div class="stack">
+                {% for row in objective_rows %}
+                    <div class="card card--white">
+                        <p class="muted text-sm">Question {{ row.question.order }} - {{ row.question.points }} points</p>
+                        <p style="margin: 0.5rem 0 1rem;">{{ row.question.text }}</p>
+                        <div class="stack">
+                            {% for choice in row.choices %}
+                                <label class="check-label">
+                                    <input type="radio" name="choice_{{ row.question.pk }}" value="{{ choice.pk }}" {% if row.selected_choice_id == choice.pk %}checked{% endif %}>
+                                    <span>{{ choice.text }}</span>
+                                </label>
+                            {% empty %}
+                                <p class="muted text-sm">No options were set for this question.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if theory_rows %}
+        <section class="section">
+            <h2 class="section-title">Section B - Theory</h2>
+            <div class="stack">
+                {% for row in theory_rows %}
+                    <div class="card card--white">
+                        <p class="muted text-sm">Question {{ row.question.order }} - {{ row.question.points }} points</p>
+                        <p style="margin: 0.5rem 0 1rem;">{{ row.question.text }}</p>
+                        <textarea name="text_{{ row.question.pk }}" rows="5" placeholder="Type your answer">{{ row.text_answer }}</textarea>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Submit answers</button>
+        <span class="muted text-sm">Once submitted, this assessment cannot be reopened.</span>
+    </div>
+</form>
+
+{% if submission.expires_at %}
+    <script>
+        (function () {
+            var el = document.getElementById("exam-timer");
+            var form = document.getElementById("exam-form");
+            if (!el || !form) { return; }
+            var end = new Date(el.dataset.expires).getTime();
+            function tick() {
+                var left = end - Date.now();
+                if (left <= 0) {
+                    el.textContent = "Time is up. Submitting...";
+                    form.submit();
+                    return;
+                }
+                var minutes = Math.floor(left / 60000);
+                var seconds = Math.floor((left % 60000) / 1000);
+                el.textContent = "Time remaining: " + minutes + "m " + seconds + "s";
+            }
+            tick();
+            setInterval(tick, 1000);
+        })();
+    </script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+    <div class="auth-card">
+        <h1 class="card-title">Sign in</h1>
+        <p class="card-subtitle">Use the email address on your account.</p>
+
+        <form class="auth-form" method="post" novalidate>
+            {% csrf_token %}
+            {% include "partials/_form_errors.html" %}
+            <div class="form-field {% if form.username.errors %}has-error{% endif %}">
+                <label for="{{ form.username.id_for_label }}">Email</label>
+                {{ form.username }}
+            </div>
+            <div class="form-field {% if form.password.errors %}has-error{% endif %}">
+                <label for="{{ form.password.id_for_label }}">Password</label>
+                {{ form.password }}
+            </div>
+            <input type="hidden" name="next" value="{{ next }}">
+            <button class="btn btn-primary" type="submit">Sign in</button>
+        </form>
+
+        <p class="auth-foot"><a href="{% url 'accounts:password_reset' %}">Forgot your password?</a></p>
+        <p class="auth-foot">No account yet? <a href="{% url 'accounts:signup' %}">Register a school</a>.</p>
+    </div>
+</div>
+{% endblock %}

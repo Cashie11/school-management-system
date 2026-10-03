@@ -1,0 +1,12 @@
+Results for {{ student.full_name }}
+
+{{ report.term.name }} at {{ school.name }}{% if report.school_class %} - {{ report.school_class }}{% endif %}
+
+{% for subject in report.subjects %}{{ subject.subject }}: {{ subject.obtained }} / {{ subject.possible }}{% if subject.percentage is not None %} ({{ subject.percentage }}%{% if subject.grade %}, grade {{ subject.grade.0 }}{% endif %}){% endif %}
+{% empty %}No scores were recorded for this term.
+{% endfor %}
+Overall: {% if report.overall is not None %}{{ report.overall }}%{% else %}-{% endif %}{% if report.grade %} ({{ report.grade.0 }} - {{ report.grade.1 }}){% endif %}
+Total: {{ report.total_obtained }} / {{ report.total_possible }}
+{% if position %}Position: {{ position }} of {{ class_size }}
+{% endif %}
+Sign in to the portal to download the report card as a PDF.

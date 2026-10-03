@@ -1,0 +1,11 @@
+Welcome to {{ school.name }}
+
+Hello {{ student.full_name }},
+
+You have been registered at {{ school.name }}.
+
+Admission number: {{ student.admission_number }}
+
+Your guardian signs in to the portal to follow your results, attendance and assessments.
+
+If you were not expecting this message, contact the school office.

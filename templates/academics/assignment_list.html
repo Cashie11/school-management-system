@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher assignments{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Teacher assignments</h1>
+        <p class="page-lead">Assign a teacher to each subject taught to a class.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'academics:assignment_create' %}"><i class="bi bi-plus-lg"></i> Add assignment</a>
+</div>
+
+{% include "academics/_tabs.html" %}
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Class</th>
+                <th>Subject</th>
+                <th>Teacher</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for assignment in assignments %}
+                <tr>
+                    <td>{{ assignment.school_class }}</td>
+                    <td>{{ assignment.subject }}</td>
+                    <td class="muted">
+                        {% if assignment.teacher %}
+                            {{ assignment.teacher.get_full_name|default:assignment.teacher.email }}
+                        {% else %}
+                            Unassigned
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="btn btn-secondary btn-sm" href="{% url 'academics:assignment_edit' assignment.pk %}">Edit</a>
+                            <a class="btn btn-ghost btn-sm" href="{% url 'academics:assignment_delete' assignment.pk %}">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-state">No assignments yet. Add classes and subjects first.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

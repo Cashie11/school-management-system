@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Assessments{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">{{ student.full_name }} - assessments</h1>
+        <p class="page-lead">Online assessments set for this student's classes.</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url 'portal:home' %}">Back</a>
+</div>
+
+{% include "portal/_student_tabs.html" %}
+
+<div class="table-wrap">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Assessment</th>
+                <th>Subject</th>
+                <th>Term</th>
+                <th>Status</th>
+                <th class="numeric">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr>
+                    <td>{{ row.assessment.name }}</td>
+                    <td>{{ row.assessment.class_subject.subject }}</td>
+                    <td class="muted">{{ row.assessment.term }}</td>
+                    <td>
+                        {% if row.submission and row.submission.status == "marked" %}
+                            <span class="badge badge--active">Marked</span>
+                        {% elif row.submission and row.submission.status == "submitted" %}
+                            <span class="badge badge--late">Awaiting marking</span>
+                        {% elif row.submission %}
+                            <span class="badge badge--neutral">In progress</span>
+                        {% elif not row.is_open %}
+                            <span class="badge badge--neutral">{{ row.reason }}</span>
+                        {% else %}
+                            <span class="badge badge--neutral">Not started</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            {% if row.submission and row.submission.status != "in_progress" %}
+                                <a class="btn btn-secondary btn-sm" href="{% url 'portal:exam_result' student.pk row.assessment.pk %}">Result</a>
+                            {% elif row.is_open %}
+                                <a class="btn btn-primary btn-sm" href="{% url 'portal:exam_take' student.pk row.assessment.pk %}">{% if row.submission %}Continue{% else %}Start{% endif %}</a>
+                            {% else %}
+                                <span class="muted text-sm">{{ row.reason }}</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="empty-state">No online assessments for this student.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
