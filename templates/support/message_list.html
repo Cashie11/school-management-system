@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Support inbox{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Support inbox</h1>
+        <p class="page-lead">Messages sent through the support form across every school.</p>
+    </div>
+</div>
+
+{% for support_message in support_messages %}
+    <article class="card card--white support-message">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">{{ support_message.subject }}</h2>
+                <p class="card-subtitle">
+                    {{ support_message.name }} &lt;{{ support_message.email }}&gt;
+                    {% if support_message.school %} - {{ support_message.school.name }}{% endif %}
+                    - {{ support_message.created_at|date:"j M Y, H:i" }}
+                </p>
+            </div>
+            {% if support_message.status == "new" %}
+                <span class="badge badge--warning">{{ support_message.get_status_display }}</span>
+            {% else %}
+                <span class="badge badge--active">{{ support_message.get_status_display }}</span>
+            {% endif %}
+        </div>
+        <p class="support-message__body">{{ support_message.body }}</p>
+        <div class="row">
+            <a class="btn btn-secondary btn-sm" href="mailto:{{ support_message.email }}?subject=Re: {{ support_message.subject|urlencode }}"><i class="bi bi-reply"></i> Reply</a>
+            {% if support_message.status == "new" %}
+                <form method="post" action="{% url 'support:message_resolve' support_message.pk %}" class="inline-form">
+                    {% csrf_token %}
+                    <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-check2"></i> Mark resolved</button>
+                </form>
+            {% endif %}
+        </div>
+    </article>
+{% empty %}
+    <div class="card">
+        <p class="empty-state"><i class="bi bi-inbox"></i> No support messages yet.</p>
+    </div>
+{% endfor %}
+{% endblock %}

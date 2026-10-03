@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Message sent{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+    <div class="auth-card">
+        <span class="card-icon"><i class="bi bi-check2-circle"></i></span>
+        <h1 class="card-title">Message sent</h1>
+        <p class="card-subtitle">
+            Thank you. The support team has received your message and will reply to your
+            email address. You do not need to send it again.
+        </p>
+        <div class="form-actions">
+            <a class="btn btn-primary" href="{% url 'support:help' %}">Back to the help centre</a>
+            <a class="btn btn-secondary" href="{% url 'dashboard:home' %}">Go to the dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

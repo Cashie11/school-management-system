@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy policy{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Privacy policy</h1>
+        <p class="page-lead">
+            How the school platform handles personal data. Last updated {{ "now"|date:"F Y" }}.
+        </p>
+    </div>
+</div>
+
+<article class="card card--white article">
+    <section class="article-section">
+        <h2 class="section-title">Who is responsible for the data</h2>
+        <p>
+            This platform is used by schools to manage their own records. For the data a
+            school enters, <strong>the school is the data controller</strong> and decides what
+            is collected and why. The platform is the <strong>data processor</strong>: it stores
+            and processes that data on the school's behalf and on the school's instructions.
+        </p>
+        <p>
+            Requests about a student's records should go to the school first. The platform
+            team handles requests about the platform itself.
+        </p>
+    </section>
+
+    <section class="article-section">
+        <h2 class="section-title">What is stored</h2>
+        <ul class="bullet-list">
+            <li>Account details for staff, parents and students: name, email address, role and password (stored only as a secure hash).</li>
+            <li>Student records: name, admission number, date of birth, gender, contact details and class.</li>
+            <li>Enrollment history, attendance records, assessment scores and report cards.</li>
+            <li>A log of the notifications that have been emailed, and the address each was sent to.</li>
+            <li>Any school logo uploaded for display in the interface and on report cards.</li>
+            <li>Support messages sent through the contact form.</li>
+        </ul>
+    </section>
+
+    <section class="article-section">
+        <h2 class="section-title">Why it is stored</h2>
+        <p>
+            The data is used only to run the school's own administration: teaching,
+            attendance, assessment, reporting and communication with families. It is not
+            sold, and it is not used for advertising.
+        </p>
+    </section>
+
+    <section class="article-section">
+        <h2 class="section-title">Who can see it</h2>
+        <p>
+            Each school's data is kept separate. Every read is scoped to the school the
+            signed-in account belongs to, enforced at the database query layer, so one
+            school cannot see another school's records. Within a school, access follows the
+            account's role: management sees the whole school, teachers see the classes they
+            teach, and parents and students see only the students linked to them.
+        </p>
+    </section>
+
+    <section class="article-section">
+        <h2 class="section-title">How long it is kept</h2>
+        <p>
+            Records are kept for as long as the school needs them. When a school leaves the
+            platform, its data is removed. Accounts can be suspended or removed at any time;
+            a removed account keeps its history so past records stay complete, and can be
+            restored if the person returns.
+        </p>
+    </section>
+
+    <section class="article-section">
+        <h2 class="section-title">Your rights</h2>
+        <p>
+            You can ask to see, correct or delete the personal data held about you, and you
+            can object to how it is used. Email notifications can be changed by the school.
+            For anything about a student's records, contact the school; for anything about
+            the platform, contact support.
+        </p>
+    </section>
+
+    <section class="article-section">
+        <h2 class="section-title">Cookies</h2>
+        <p>
+            The platform uses a small number of essential cookies only: one to keep you
+            signed in, one to protect forms against cross-site request forgery, and one for
+            short-lived status messages. No advertising or tracking cookies are used.
+        </p>
+    </section>
+
+    <section class="article-section">
+        <h2 class="section-title">Changes to this policy</h2>
+        <p>
+            This policy may be updated as the platform changes. The date at the top shows the
+            most recent revision.
+        </p>
+    </section>
+
+    <section class="article-section">
+        <h2 class="section-title">Contact</h2>
+        <p>
+            For questions about this policy or a data request, use the support form and the
+            team will respond by email.
+        </p>
+    </section>
+</article>
+
+<div class="row" style="margin-top: 1.5rem;">
+    <a class="btn btn-primary" href="{% url 'support:contact' %}"><i class="bi bi-envelope"></i> Contact support</a>
+    <a class="btn btn-secondary" href="{% url 'support:help' %}"><i class="bi bi-life-preserver"></i> Help centre</a>
+</div>
+{% endblock %}

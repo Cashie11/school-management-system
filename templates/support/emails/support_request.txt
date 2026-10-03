@@ -1,0 +1,11 @@
+A new support request was submitted.
+
+From: {{ message.name }} <{{ message.email }}>
+{% if message.school %}School: {{ message.school.name }}
+{% endif %}Received: {{ message.created_at|date:"j M Y, H:i" }}
+
+Subject: {{ message.subject }}
+
+{{ message.body }}
+
+Reply directly to this email to reach {{ message.name }}.

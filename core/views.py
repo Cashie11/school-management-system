@@ -9,6 +9,10 @@ def home(request):
     return render(request, "core/home.html")
 
 
+def privacy(request):
+    return render(request, "core/privacy.html")
+
+
 def health(request):
     """Liveness probe used by monitoring and deployment checks."""
     try:

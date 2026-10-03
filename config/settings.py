@@ -120,6 +120,7 @@ INSTALLED_APPS = [
     "portal",
     "announcements",
     "notifications",
+    "support",
     "dashboard",
     "core",
 ]
@@ -147,6 +148,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.active_school",
+                "core.context_processors.navigation",
             ],
         },
     },
@@ -222,6 +224,8 @@ EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
 DEFAULT_FROM_EMAIL = os.environ.get(
     "DEFAULT_FROM_EMAIL", "School Management <no-reply@school-management.test>"
 )
+# Where the contact form delivers. Falls back to the sender address.
+SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", "") or DEFAULT_FROM_EMAIL
 
 # Celery. Notifications are queued so a slow mail server never delays a request.
 # Without a broker configured the tasks run inline, which is what development and

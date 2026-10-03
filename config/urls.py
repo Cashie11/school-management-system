@@ -20,6 +20,7 @@ urlpatterns = [
     path("announcements/", include("announcements.urls")),
     path("dashboard/", include("dashboard.urls")),
     path("platform/", include("tenancy.urls")),
+    path("help/", include("support.urls")),
 ]
 
 if settings.DEBUG:

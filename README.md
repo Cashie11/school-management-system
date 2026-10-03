@@ -11,6 +11,23 @@ PostgreSQL database. Tenant isolation is enforced at the query layer and covered
 - Celery with Redis for background email delivery
 - ReportLab for report card PDFs
 
+## Features
+
+- **Two-pane navigation** that lists every section and its pages in the sidebar,
+  so sub-pages such as *Add student* are one click away instead of hidden in a menu.
+- School onboarding with a logo, and role-based access for School Admins,
+  Teachers and Parents/Students.
+- Academics: terms, subjects, classes and teacher assignments.
+- Student records, enrollment history per term, guardians and discipline notes.
+- Attendance registers, with an absence notification to the family.
+- Assessments, online assessments (objective answers marked automatically and
+  theory answers marked by the teacher), results and PDF report cards.
+- Announcements targeted by audience and by class, with automatic expiry.
+- Email notifications delivered in the background through Celery.
+- A **help centre** with written guides, and a **support form** that emails your
+  support address and keeps a record of the request.
+- A platform **privacy policy** at `/privacy/`.
+
 ## Local Setup
 
 Install Python 3.12 or later. You need a PostgreSQL 16 database, or you can run on SQLite
@@ -124,6 +141,7 @@ Worth knowing before a real deployment:
 | `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD` | SMTP credentials. |
 | `EMAIL_USE_TLS` | Use TLS for SMTP. Defaults to on. |
 | `DEFAULT_FROM_EMAIL` | Sender address for notifications. |
+| `SUPPORT_EMAIL` | Where the support form delivers. Defaults to `DEFAULT_FROM_EMAIL`. |
 
 To run the suite against SQLite on a machine where `.env` points at PostgreSQL:
 

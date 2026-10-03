@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Contact support{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <p class="eyebrow"><a href="{% url 'support:help' %}">Help centre</a> / Contact</p>
+        <h1 class="page-title">Contact support</h1>
+        <p class="page-lead">
+            Tell us what happened and the team will reply to your email address. The more
+            detail you give, the faster it can be resolved.
+        </p>
+    </div>
+</div>
+
+<div class="card card--white" style="max-width: 46rem;">
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% include "partials/_form_errors.html" %}
+
+        <div class="form-grid">
+            <div class="form-field {% if form.name.errors %}has-error{% endif %}">
+                <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+            <div class="form-field {% if form.email.errors %}has-error{% endif %}">
+                <label for="{{ form.email.id_for_label }}">Email address</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+            <div class="form-field form-field--full {% if form.subject.errors %}has-error{% endif %}">
+                <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+                {{ form.subject }}
+                {{ form.subject.errors }}
+            </div>
+            <div class="form-field form-field--full {% if form.body.errors %}has-error{% endif %}">
+                <label for="{{ form.body.id_for_label }}">{{ form.body.label }}</label>
+                {{ form.body }}
+                {% if form.body.help_text %}<p class="help-text">{{ form.body.help_text }}</p>{% endif %}
+                {{ form.body.errors }}
+            </div>
+        </div>
+
+        <div class="honeypot" aria-hidden="true">
+            <label for="{{ form.website.id_for_label }}">{{ form.website.label }}</label>
+            {{ form.website }}
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-send"></i> Send message</button>
+            <a class="btn btn-secondary" href="{% url 'support:help' %}">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

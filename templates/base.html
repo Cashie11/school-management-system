@@ -13,6 +13,13 @@
 <div class="app-shell">
     <header class="site-header">
         <div class="container header-inner">
+            {% if user.is_authenticated %}
+                <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="side-nav">
+                    <i class="bi bi-list" aria-hidden="true"></i>
+                    <span class="visually-hidden">Toggle navigation</span>
+                </button>
+            {% endif %}
+
             <a class="brand" href="{% url 'core:home' %}">
                 {% if active_school and active_school.logo %}
                     <img class="brand-logo" src="{{ active_school.logo.url }}" alt="{{ active_school.name }}">
@@ -22,140 +29,72 @@
                 <span class="brand-name">{{ active_school.name|default:"School Management" }}</span>
             </a>
 
-            <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">
-                <i class="bi bi-list" aria-hidden="true"></i>
-                <span class="visually-hidden">Toggle navigation</span>
-            </button>
-
-            <div class="header-menu" id="site-nav" data-nav-menu>
-                {% if user.is_authenticated %}
-                    <nav class="nav-list">
-                        <a class="nav-link {% if request.resolver_match.namespace == 'dashboard' and request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'dashboard:home' %}"><i class="bi bi-house-door"></i> Dashboard</a>
-                        <a class="nav-link {% if request.resolver_match.namespace == 'announcements' %}active{% endif %}" href="{% url 'announcements:list' %}"><i class="bi bi-megaphone"></i> Announcements</a>
-
-                        {% if user.is_school_admin or user.is_super_admin or user.is_teacher %}
-                            <div class="nav-group" data-nav-group>
-                                <button class="nav-link nav-trigger {% if request.resolver_match.namespace == 'students' or request.resolver_match.url_name == 'class_list' or request.resolver_match.url_name == 'class_detail' or request.resolver_match.namespace == 'attendance' %}active{% endif %}" type="button" data-nav-trigger aria-expanded="false">
-                                    <i class="bi bi-collection"></i> Classes <i class="bi bi-chevron-down nav-caret"></i>
-                                </button>
-                                <div class="nav-dropdown" data-nav-panel>
-                                    <a class="dropdown-link" href="{% url 'dashboard:class_list' %}"><i class="bi bi-collection"></i> My classes</a>
-                                    <a class="dropdown-link" href="{% url 'students:student_list' %}"><i class="bi bi-people"></i> Students</a>
-                                    <a class="dropdown-link" href="{% url 'students:enrollment_list' %}"><i class="bi bi-journal-check"></i> Enrollment</a>
-                                    <a class="dropdown-link" href="{% url 'attendance:register' %}"><i class="bi bi-calendar2-check"></i> Attendance</a>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        {% if user.is_school_admin or user.is_super_admin %}
-                            <div class="nav-group" data-nav-group>
-                                <button class="nav-link nav-trigger {% if request.resolver_match.namespace == 'academics' %}active{% endif %}" type="button" data-nav-trigger aria-expanded="false">
-                                    <i class="bi bi-book"></i> Academics <i class="bi bi-chevron-down nav-caret"></i>
-                                </button>
-                                <div class="nav-dropdown" data-nav-panel>
-                                    <a class="dropdown-link" href="{% url 'academics:term_list' %}"><i class="bi bi-calendar3"></i> Terms</a>
-                                    <a class="dropdown-link" href="{% url 'academics:subject_list' %}"><i class="bi bi-book"></i> Subjects</a>
-                                    <a class="dropdown-link" href="{% url 'academics:class_list' %}"><i class="bi bi-collection"></i> Classes</a>
-                                    <a class="dropdown-link" href="{% url 'academics:assignment_list' %}"><i class="bi bi-person-video3"></i> Teacher assignments</a>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        {% if user.is_school_admin or user.is_super_admin or user.is_teacher %}
-                            <div class="nav-group" data-nav-group>
-                                <button class="nav-link nav-trigger {% if request.resolver_match.namespace == 'results' %}active{% endif %}" type="button" data-nav-trigger aria-expanded="false">
-                                    <i class="bi bi-clipboard2-data"></i> Results <i class="bi bi-chevron-down nav-caret"></i>
-                                </button>
-                                <div class="nav-dropdown" data-nav-panel>
-                                    <a class="dropdown-link" href="{% url 'results:assessment_list' %}"><i class="bi bi-clipboard2-data"></i> Assessments</a>
-                                    <a class="dropdown-link" href="{% url 'results:report_card_select' %}"><i class="bi bi-file-earmark-text"></i> Report cards</a>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        {% if user.is_school_admin or user.is_super_admin %}
-                            <div class="nav-group" data-nav-group>
-                                <button class="nav-link nav-trigger {% if request.resolver_match.url_name == 'staff_list' or request.resolver_match.url_name == 'parent_list' or request.resolver_match.url_name == 'discipline_list' %}active{% endif %}" type="button" data-nav-trigger aria-expanded="false">
-                                    <i class="bi bi-person-badge"></i> Accounts <i class="bi bi-chevron-down nav-caret"></i>
-                                </button>
-                                <div class="nav-dropdown" data-nav-panel>
-                                    <a class="dropdown-link" href="{% url 'accounts:staff_list' %}"><i class="bi bi-person-badge"></i> Staff</a>
-                                    <a class="dropdown-link" href="{% url 'accounts:parent_list' %}"><i class="bi bi-people"></i> Parents and Students</a>
-                                    <a class="dropdown-link" href="{% url 'students:discipline_list' %}"><i class="bi bi-shield-exclamation"></i> Discipline</a>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        {% if user.is_super_admin %}
-                            <a class="nav-link {% if request.resolver_match.namespace == 'tenancy' %}active{% endif %}" href="{% url 'tenancy:school_list' %}"><i class="bi bi-buildings"></i> Schools</a>
-                        {% endif %}
-
-                        {% if user.is_parent_student %}
-                            <a class="nav-link {% if request.resolver_match.namespace == 'portal' %}active{% endif %}" href="{% url 'portal:home' %}"><i class="bi bi-mortarboard"></i> My portal</a>
-                        {% endif %}
-
-                        {% block nav %}{% endblock %}
-                    </nav>
+            <div class="header-right">
+                {% if active_school %}
+                    <span class="chip chip--accent header-chip"><i class="bi bi-building"></i> {{ active_school.name }}</span>
                 {% endif %}
-
-                <div class="header-right">
-                    {% if active_school %}
-                        <span class="chip chip--accent"><i class="bi bi-building"></i> {{ active_school.name }}</span>
-                    {% endif %}
-                    {% if user.is_authenticated %}
-                        <div class="nav-group" data-nav-group>
-                            <button class="chip chip--button" type="button" data-nav-trigger aria-expanded="false">
-                                <i class="bi bi-person-circle"></i> Account <i class="bi bi-chevron-down nav-caret"></i>
-                            </button>
-                            <div class="nav-dropdown nav-dropdown--right" data-nav-panel>
-                                <div class="dropdown-header">
-                                    <strong>{{ user.email }}</strong>
-                                    {{ user.get_role_display }}
-                                </div>
-                                <a class="dropdown-link" href="{% url 'accounts:school_profile' %}"><i class="bi bi-building-gear"></i> School profile</a>
-                                <a class="dropdown-link" href="{% url 'accounts:password_change' %}"><i class="bi bi-shield-lock"></i> Change password</a>
-                                <form method="post" action="{% url 'accounts:logout' %}">
-                                    {% csrf_token %}
-                                    <button class="dropdown-link" type="submit"><i class="bi bi-box-arrow-right"></i> Sign out</button>
-                                </form>
+                {% if user.is_authenticated %}
+                    <div class="nav-group" data-nav-group>
+                        <button class="chip chip--button" type="button" data-nav-trigger aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> Account <i class="bi bi-chevron-down nav-caret"></i>
+                        </button>
+                        <div class="nav-dropdown nav-dropdown--right" data-nav-panel>
+                            <div class="dropdown-header">
+                                <strong>{{ user.email }}</strong>
+                                {{ user.get_role_display }}
                             </div>
+                            <a class="dropdown-link" href="{% url 'accounts:school_profile' %}"><i class="bi bi-building-gear"></i> School profile</a>
+                            <a class="dropdown-link" href="{% url 'accounts:password_change' %}"><i class="bi bi-shield-lock"></i> Change password</a>
+                            <a class="dropdown-link" href="{% url 'support:help' %}"><i class="bi bi-life-preserver"></i> Help centre</a>
+                            <form method="post" action="{% url 'accounts:logout' %}">
+                                {% csrf_token %}
+                                <button class="dropdown-link" type="submit"><i class="bi bi-box-arrow-right"></i> Sign out</button>
+                            </form>
                         </div>
-                    {% else %}
-                        <a class="nav-link" href="{% url 'accounts:login' %}"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
-                        <a class="btn btn-primary btn-sm" href="{% url 'accounts:signup' %}"><i class="bi bi-plus-circle"></i> Register a school</a>
-                    {% endif %}
-                </div>
+                    </div>
+                {% else %}
+                    <a class="nav-link" href="{% url 'accounts:login' %}"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
+                    <a class="btn btn-primary btn-sm" href="{% url 'accounts:signup' %}"><i class="bi bi-plus-circle"></i> Register a school</a>
+                {% endif %}
             </div>
         </div>
     </header>
 
-    <main class="main">
-        <div class="container">
-            {% include "partials/_messages.html" %}
-            {% if not request.resolver_match.url_name|in_list:"home,login,signup,logout,password_reset,password_reset_done,password_reset_confirm,password_reset_complete,password_change,password_change_done" %}
-                <div class="back-row">
-                    <button class="btn btn-ghost btn-sm" type="button" data-back data-back-fallback="{% url 'dashboard:home' %}">
-                        <i class="bi bi-arrow-left"></i> Back
-                    </button>
-                </div>
-            {% endif %}
-            {% block content %}{% endblock %}
-        </div>
-    </main>
+    <div class="app-body">
+        {% if user.is_authenticated %}
+            {% include "partials/_side_nav.html" %}
+            <div class="nav-backdrop" data-nav-backdrop hidden></div>
+        {% endif %}
+
+        <main class="main">
+            <div class="container">
+                {% include "partials/_messages.html" %}
+                {% if not request.resolver_match.url_name|in_list:"home,login,signup,logout,password_reset,password_reset_done,password_reset_confirm,password_reset_complete,password_change,password_change_done" %}
+                    <div class="back-row">
+                        <button class="btn btn-ghost btn-sm" type="button" data-back data-back-fallback="{% url 'dashboard:home' %}">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                    </div>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
 
     <footer class="site-footer">
         <div class="container footer-inner">
-            <span class="footer-note">School Management</span>
-            <span class="footer-note">Multi-tenant school administration</span>
+            <span class="footer-note">School Management - multi-tenant school administration</span>
+            <nav class="footer-links">
+                <a href="{% url 'support:help' %}">Help centre</a>
+                <a href="{% url 'support:contact' %}">Contact support</a>
+                <a href="{% url 'core:privacy' %}">Privacy policy</a>
+            </nav>
         </div>
     </footer>
 </div>
 
 <script>
     (function () {
-        var groups = Array.prototype.slice.call(document.querySelectorAll("[data-nav-group]"));
-        var mobile = window.matchMedia("(max-width: 1279px)");
-
         // Label every table cell from its column header so tables can stack into
         // cards on small screens. Done in script so no template needs data-labels.
         function stackTables() {
@@ -251,25 +190,15 @@
             });
         });
 
+        // Account menu (a dropdown in the header).
+        var groups = Array.prototype.slice.call(document.querySelectorAll("[data-nav-group]"));
+
         function closeAll() {
             groups.forEach(function (group) {
                 group.classList.remove("is-open");
                 var trigger = group.querySelector("[data-nav-trigger]");
                 if (trigger) {
                     trigger.setAttribute("aria-expanded", "false");
-                }
-            });
-        }
-
-        function openActiveGroup() {
-            if (!mobile.matches) {
-                return;
-            }
-            groups.forEach(function (group) {
-                var trigger = group.querySelector("[data-nav-trigger]");
-                if (trigger && trigger.classList.contains("active")) {
-                    group.classList.add("is-open");
-                    trigger.setAttribute("aria-expanded", "true");
                 }
             });
         }
@@ -297,28 +226,108 @@
             }
         });
 
-        var toggle = document.querySelector("[data-nav-toggle]");
-        var menu = document.querySelector("[data-nav-menu]");
-        if (toggle && menu) {
-            toggle.addEventListener("click", function () {
-                var opened = menu.classList.toggle("is-open");
-                toggle.setAttribute("aria-expanded", opened ? "true" : "false");
-                var icon = toggle.querySelector("i");
+        // Two-pane navigation drawer on small screens.
+        var navToggle = document.querySelector("[data-nav-toggle]");
+        var sideNav = document.querySelector("[data-side-nav]");
+        var backdrop = document.querySelector("[data-nav-backdrop]");
+
+        function setSideNav(open) {
+            if (!sideNav) {
+                return;
+            }
+            sideNav.classList.toggle("is-open", open);
+            if (backdrop) {
+                backdrop.hidden = !open;
+                backdrop.classList.toggle("is-open", open);
+            }
+            document.body.classList.toggle("nav-open", open);
+            if (navToggle) {
+                navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+                var icon = navToggle.querySelector("i");
                 if (icon) {
-                    icon.className = opened ? "bi bi-x-lg" : "bi bi-list";
+                    icon.className = open ? "bi bi-x-lg" : "bi bi-list";
                 }
-                if (opened) {
-                    openActiveGroup();
-                } else {
-                    closeAll();
+            }
+        }
+
+        if (navToggle && sideNav) {
+            navToggle.addEventListener("click", function () {
+                setSideNav(!sideNav.classList.contains("is-open"));
+            });
+        }
+        if (backdrop) {
+            backdrop.addEventListener("click", function () {
+                setSideNav(false);
+            });
+        }
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                setSideNav(false);
+            }
+        });
+        window.addEventListener("resize", function () {
+            if (window.innerWidth >= 1024) {
+                setSideNav(false);
+            }
+        });
+
+        // The section pane starts collapsed and can be pinned open. The choice is
+        // remembered so it survives navigation between pages.
+        var panelToggle = document.querySelector("[data-panel-toggle]");
+        var PANEL_KEY = "sideNavPanelOpen";
+
+        function setPanel(open) {
+            if (!sideNav) {
+                return;
+            }
+            sideNav.classList.toggle("is-expanded", open);
+            if (!panelToggle) {
+                return;
+            }
+            panelToggle.setAttribute("aria-expanded", open ? "true" : "false");
+            var icon = panelToggle.querySelector("i");
+            if (icon) {
+                icon.className = open
+                    ? "bi bi-chevron-double-left"
+                    : "bi bi-chevron-double-right";
+            }
+            var label = panelToggle.querySelector(".visually-hidden");
+            if (label) {
+                label.textContent = open ? "Hide the section menu" : "Show the section menu";
+            }
+        }
+
+        var panelOpen = false;
+        try {
+            panelOpen = window.localStorage.getItem(PANEL_KEY) === "1";
+        } catch (error) {
+            panelOpen = false;
+        }
+        setPanel(panelOpen);
+
+        if (panelToggle && sideNav) {
+            panelToggle.addEventListener("click", function () {
+                var open = !sideNav.classList.contains("is-expanded");
+                setPanel(open);
+                try {
+                    window.localStorage.setItem(PANEL_KEY, open ? "1" : "0");
+                } catch (error) {
+                    /* Storage unavailable; the toggle still works for this page. */
                 }
             });
         }
 
-        window.addEventListener("resize", function () {
-            if (!mobile.matches) {
-                closeAll();
-            }
+        // On small screens each section is an accordion, with the active one open.
+        document.querySelectorAll("[data-section-toggle]").forEach(function (trigger) {
+            trigger.addEventListener("click", function () {
+                var section = trigger.closest(".panel-section");
+                if (!section) {
+                    return;
+                }
+                var open = !section.classList.contains("is-open");
+                section.classList.toggle("is-open", open);
+                trigger.setAttribute("aria-expanded", open ? "true" : "false");
+            });
         });
     })();
 </script>

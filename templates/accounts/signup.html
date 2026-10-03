@@ -44,6 +44,11 @@
                 {{ form.password2.errors }}
             </div>
 
+            <p class="help-text">
+                By creating a school you agree to the
+                <a href="{% url 'core:privacy' %}">privacy policy</a>.
+            </p>
+
             <button class="btn btn-primary" type="submit">Create school</button>
         </form>
 

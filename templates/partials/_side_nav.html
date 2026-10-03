@@ -1,0 +1,42 @@
+<aside class="side-nav" id="side-nav" data-side-nav>
+    <div class="side-nav__rail">
+        <div class="rail-head">
+            <span class="rail-head__title">Menu</span>
+            <button class="rail-toggle" type="button" data-panel-toggle aria-expanded="false" aria-controls="side-nav-panel">
+                <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+                <span class="visually-hidden">Show the section menu</span>
+            </button>
+        </div>
+
+        {% for section in nav_sections %}
+            <a class="rail-link {% if section.active %}is-active{% endif %}"
+               href="{{ section.url }}"
+               {% if section.active %}aria-current="true"{% endif %}>
+                <i class="{{ section.icon }}" aria-hidden="true"></i>
+                <span>{{ section.label }}</span>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="side-nav__panel" id="side-nav-panel">
+        {% for section in nav_sections %}
+            <div class="panel-section {% if section.active %}is-active is-open{% endif %}">
+                <button class="panel-title" type="button" data-section-toggle
+                        aria-expanded="{% if section.active %}true{% else %}false{% endif %}">
+                    <span>{{ section.label }}</span>
+                    <i class="bi bi-chevron-down panel-caret" aria-hidden="true"></i>
+                </button>
+                <div class="panel-links">
+                    {% for item in section.items %}
+                        <a class="panel-link {% if item.active %}is-active{% endif %}"
+                           href="{{ item.url }}"
+                           {% if item.active %}aria-current="page"{% endif %}>
+                            <i class="{{ item.icon }}" aria-hidden="true"></i>
+                            <span>{{ item.label }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</aside>

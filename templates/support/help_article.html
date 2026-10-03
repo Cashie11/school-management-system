@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}{{ guide.title }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <p class="eyebrow"><a href="{% url 'support:help' %}">Help centre</a> / {{ guide.audience }}</p>
+        <h1 class="page-title">{{ guide.title }}</h1>
+        <p class="page-lead">{{ guide.summary }}</p>
+    </div>
+</div>
+
+<article class="card card--white article">
+    {% for section in guide.sections %}
+        <section class="article-section">
+            <h2 class="section-title">{{ section.heading }}</h2>
+            {% for paragraph in section.paragraphs %}
+                <p>{{ paragraph }}</p>
+            {% endfor %}
+            {% if section.steps %}
+                <ol class="steps">
+                    {% for step in section.steps %}<li>{{ step }}</li>{% endfor %}
+                </ol>
+            {% endif %}
+        </section>
+    {% endfor %}
+</article>
+
+<div class="row" style="margin-top: 1.5rem;">
+    <a class="btn btn-secondary" href="{% url 'support:help' %}"><i class="bi bi-arrow-left"></i> All guides</a>
+    <a class="btn btn-primary" href="{% url 'support:contact' %}"><i class="bi bi-life-preserver"></i> Still need help?</a>
+</div>
+{% endblock %}

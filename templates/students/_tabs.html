@@ -1,8 +1,0 @@
-<nav class="tabs">
-    <a class="nav-link {% if active == 'students' %}active{% endif %}" href="{% url 'students:student_list' %}"><i class="bi bi-people"></i> Students</a>
-    {% if user.is_school_admin or user.is_super_admin %}
-        <a class="nav-link {% if active == 'enrollments' %}active{% endif %}" href="{% url 'students:enrollment_list' %}"><i class="bi bi-journal-check"></i> Enrollment</a>
-        <a class="nav-link {% if active == 'guardians' %}active{% endif %}" href="{% url 'students:guardian_list' %}"><i class="bi bi-person-hearts"></i> Guardians</a>
-        <a class="nav-link {% if active == 'discipline' %}active{% endif %}" href="{% url 'students:discipline_list' %}"><i class="bi bi-shield-exclamation"></i> Discipline</a>
-    {% endif %}
-</nav>
