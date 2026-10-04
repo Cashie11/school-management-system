@@ -355,6 +355,12 @@ ul {
     margin-left: auto;
 }
 
+.header-auth {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
 .nav-toggle {
     display: none;
     align-items: center;
@@ -1122,29 +1128,60 @@ table.table th.numeric {
 /* Hero -------------------------------------------------------------------- */
 
 .hero {
-    padding: 3rem 0 2rem;
-    max-width: 54rem;
+    padding: 3rem 0 1.5rem;
+    max-width: 56rem;
+}
+
+.hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 1.35rem;
+    padding: 0.45rem 0.95rem 0.4rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: var(--color-text-primary);
+    font-size: var(--fz-xs);
+    font-weight: var(--fw-600);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .hero .title-h1 {
-    font-size: clamp(2rem, 1.2rem + 3.2vw, 3.5rem);
-    font-weight: 500;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-size: clamp(2.1rem, 1.2rem + 3.6vw, 3.75rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+}
+
+.hero-highlight {
+    background: var(--color-accent);
+    border-radius: 0.25em;
+    padding: 0 0.12em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
 }
 
 .hero-lead {
-    margin-top: 1.25rem;
-    font-size: 1.125rem;
-    color: var(--color-text-muted);
-    max-width: 42rem;
+    margin-top: 1.35rem;
+    font-size: 1.15rem;
+    line-height: 1.6;
+    font-weight: var(--fw-400);
+    color: rgba(41, 48, 61, 0.72);
+    max-width: 44rem;
 }
 
 .hero-actions {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.85rem;
     margin-top: 2rem;
     flex-wrap: wrap;
+}
+
+.btn-lg {
+    min-height: 3.4rem;
+    padding: 1.05rem 2rem;
+    font-size: var(--fz-md);
 }
 
 .feature-grid {
@@ -1154,15 +1191,39 @@ table.table th.numeric {
     margin-top: 1.5rem;
 }
 
+.feature-card {
+    padding: 1.75rem;
+}
+
 .feature-card h3 {
-    font-size: var(--fz-md);
-    font-weight: var(--fw-600);
     margin-bottom: 0.5rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .feature-card p {
     font-size: var(--fz-sm);
-    color: var(--color-text-muted);
+    line-height: 1.6;
+    color: rgba(41, 48, 61, 0.66);
+}
+
+.cta-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-on-dark {
+    border-color: rgba(255, 255, 255, 0.4);
+    color: var(--color-white);
+}
+
+.btn-on-dark:hover {
+    border-color: var(--color-accent);
+    color: var(--color-white);
 }
 
 /* Utility ----------------------------------------------------------------- */
@@ -1662,8 +1723,47 @@ button:focus-visible {
         padding: 0 1rem;
     }
 
+    /* The header has no room for two calls to action on a phone; the primary
+       one lives in the page body, so keep only the lighter Sign in link. */
+    .header-auth .btn {
+        display: none;
+    }
+
+    /* Let the brand give up space rather than push the controls off-screen. */
+    .brand {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .brand-name {
+        max-width: 100%;
+    }
+
     .auth-card {
         padding: 1.75rem;
+    }
+
+    .hero {
+        padding-top: 2rem;
+    }
+
+    /* Full-width buttons are easier to tap than two small ones side by side. */
+    .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-actions .btn {
+        width: 100%;
+    }
+
+    .cta-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cta-card .row .btn {
+        flex: 1 1 auto;
     }
 
     .page-head {

@@ -53,8 +53,10 @@
                         </div>
                     </div>
                 {% else %}
-                    <a class="nav-link" href="{% url 'accounts:login' %}"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
-                    <a class="btn btn-primary btn-sm" href="{% url 'accounts:signup' %}"><i class="bi bi-plus-circle"></i> Register a school</a>
+                    <div class="header-auth">
+                        <a class="nav-link" href="{% url 'accounts:login' %}"><i class="bi bi-box-arrow-in-right"></i> Sign in</a>
+                        <a class="btn btn-primary btn-sm" href="{% url 'accounts:signup' %}"><i class="bi bi-plus-circle"></i> Register a school</a>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -85,6 +87,7 @@
         <div class="container footer-inner">
             <span class="footer-note">School Management - multi-tenant school administration</span>
             <nav class="footer-links">
+                {% if not user.is_authenticated %}<a href="{% url 'accounts:login' %}">Sign in</a>{% endif %}
                 <a href="{% url 'support:help' %}">Help centre</a>
                 <a href="{% url 'support:contact' %}">Contact support</a>
                 <a href="{% url 'core:privacy' %}">Privacy policy</a>
